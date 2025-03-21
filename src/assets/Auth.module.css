@@ -1,0 +1,166 @@
+.authContainer {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  width: 100vw;
+  height: 100vh;
+  background-image: url("./img/login_bg.jpg");
+}
+
+.authBox, .registerAuthBox {
+  background: rgba(255, 255, 255, 0.2); /* Nền mờ */
+  backdrop-filter: blur(10px); /* Hiệu ứng làm mờ */
+  padding: 20px;
+  border-radius: 12px;
+  box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.1);
+  width: 350px;
+  text-align: left;
+  border: 1px solid rgba(255, 255, 255, 0.3); /* Đường viền nhẹ */
+}
+
+.registerAuthBox {
+  width: 450px;
+}
+
+.rememberMeContainer {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 1rem;
+}
+
+.title {
+  text-align: center;
+  font-size: 24px;
+  font-weight: bold;
+}
+
+.button {
+  width: 100%;
+  background-color: #007bff;
+  color: white;
+  padding: 10px;
+  border: none;
+  border-radius: 5px;
+  font-size: 16px;
+  cursor: pointer;
+  margin-top: 10px;
+}
+
+.button:hover {
+  background-color: #0056b3;
+}
+
+.link {
+  text-align: center;
+  margin-top: 12px;
+  color: lightskyblue;
+  transition: .2s ease-in-out;
+}
+
+.link:hover {
+  color: rgb(7, 249, 245);
+}
+
+.footerText {
+  text-align: center;
+}
+
+/* Modal Overlay */
+.modalOverlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  background: rgba(0, 0, 0, 0.4);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+/* Modal Box */
+.modal {
+  background: white;
+  padding: 20px;
+  border-radius: 10px;
+  text-align: center;
+  width: 300px;
+  box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.2);
+}
+
+.modal h3, .modal p {
+  color: black;
+  margin-bottom: 10px;
+}
+
+.modalInput {
+  width: 95%;
+  padding: 8px;
+  margin: 10px 0;
+  border: 1px solid #ccc;
+  border-radius: 5px;
+  color: white;
+  text-align: center;
+}
+
+.modalButton {
+  width: 100%;
+  background-color: #007bff;
+  color: white;
+  padding: 10px;
+  border: none;
+  border-radius: 5px;
+  font-size: 16px;
+  cursor: pointer;
+  margin-top: 10px;
+}
+
+.modalButton:hover {
+  background-color: #0056b3;
+}
+
+.modalClose {
+  background: none;
+  border: none;
+  color: #007bff;
+  cursor: pointer;
+  margin-top: 10px;
+}
+
+.modalClose:hover {
+  text-decoration: underline;
+}
+
+.resetMessage {
+  margin-top: 10px;
+  font-size: 14px;
+  color: green;
+}
+
+.gridContainer {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 1rem 4rem;
+  margin-bottom: 16px;
+}
+
+.success {
+  color: green;
+  font-weight: bold;
+  text-align: center;
+  margin-bottom: 10px;
+}
+
+.error {
+  color: red;
+  font-weight: bold;
+  text-align: center;
+  margin-bottom: 10px;
+}
+
+.buttonGroup {
+  display: flex;
+  justify-content: space-around;
+}
+
