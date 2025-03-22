@@ -67,7 +67,9 @@ const ResetPasswordPage = () => {
             placeholder="Confirm new password"
           />
           <center>
-            <button type="submit" className={styles.submitButton}>Reset Password</button>
+            <Button type="submit" className={styles.submitButton}>
+              Reset Password
+            </Button>
           </center>
         </form>
       </div>

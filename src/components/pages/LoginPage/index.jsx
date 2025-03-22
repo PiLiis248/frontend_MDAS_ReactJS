@@ -8,6 +8,7 @@ import styles from "../../../assets/Auth.module.css";
 import PATHS from "../../../constants/path";
 import axiosInstance from "../../../api/axios";
 import ResendConfirmationButton from "../../common/ResendConfirmationButton";
+import Button from "../../common/Button";
 
 // Schema kiểm tra login
 const loginSchema = yup.object().shape({
@@ -49,6 +50,9 @@ const LoginPage = () => {
         setError("Authentication failed. Please try again.");
         return;
       }
+
+       // 🔥 Lưu token vào localStorage
+      localStorage.setItem("token", userData.token);
 
       console.log("Login successful:", userData);
       navigate(PATHS.manageGroup);
@@ -108,7 +112,7 @@ const LoginPage = () => {
           {inactiveEmail && (
             <div className={styles.buttonGroup}>
               <ResendConfirmationButton email={inactiveEmail} />
-              <button 
+              <Button 
                 className={styles.modalClose} 
                 onClick={() => {
                   setInactiveEmail(null);
@@ -116,7 +120,7 @@ const LoginPage = () => {
                 }}
               >
                 Close
-              </button>
+              </Button>
             </div>
           )}
         </center>
@@ -136,19 +140,21 @@ const LoginPage = () => {
           />
           <div className={styles.rememberMeContainer}>
             <label>
-              <input 
-                type="checkbox" 
-                checked={rememberMe} 
-                onChange={() => setRememberMe(!rememberMe)} 
-              />
-              Remember Me
+            <InputField 
+              type="checkbox" 
+              label="Remember me"
+              checked={rememberMe} 
+              onChange={() => setRememberMe(!rememberMe)} 
+            />
             </label>
             <Link type="button" className={styles.link} onClick={() => setShowModal(true)}>
               Forgot Password?
             </Link>
           </div>
           <center>
-            <button type="submit" className={styles.submitButton}>Login</button>
+          <Button type="submit" className={styles.submitButton}>
+            Login
+          </Button>
           </center>
         </form>
         <p className={styles.footerText}>
@@ -162,30 +168,30 @@ const LoginPage = () => {
           <div className={styles.modal}>
             <h3>Reset Password</h3>
             <p>Enter your email to receive a password reset link:</p>
-            <input
+            <InputField
               type="email"
-              className={styles.modalInput}
-              placeholder="Enter your email"
+              label="Email"
               value={email}
               onChange={(e) => setEmail(e.target.value)}
+              placeholder="Enter your email"
             />
             {!isResetSent ? (
               <>
-                <button className={styles.modalButton} onClick={handleResetPassword}>
+                <Button className={styles.modalButton} onClick={handleResetPassword}>
                   Send Reset Link
-                </button>
-                <button className={styles.modalClose} onClick={closeModal}>
+                </Button>
+                <Button className={styles.modalClose} onClick={closeModal}>
                   Close
-                </button>
+                </Button>
               </>
             ) : (
               <>
-                <button className={styles.modalButton} onClick={handleResendResetPassword}>
+                <Button className={styles.modalButton} onClick={handleResendResetPassword}>
                   Resend
-                </button>
-                <button className={styles.modalClose} onClick={closeModal}>
+                </Button>
+                <Button className={styles.modalClose} onClick={closeModal}>
                   Login
-                </button>
+                </Button>
               </>
             )}
             {resetMessage && <p className={styles.resetMessage}>{resetMessage}</p>}

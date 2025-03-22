@@ -8,6 +8,7 @@ import styles from "../../../assets/Auth.module.css";
 import PATHS from "../../../constants/path";
 import axiosInstance from "../../../api/axios";
 import ResendConfirmationButton from "../../common/ResendConfirmationButton";
+import Button from "../../common/Button";
 
 // Schema kiểm tra đăng ký
 const registerSchema = yup.object().shape({
@@ -106,9 +107,9 @@ const RegisterPage = () => {
             <p className={styles.success}>{successMessage}</p>
             <div className={styles.buttonGroup}>
               <ResendConfirmationButton email={registeredEmail} />
-              <button className={styles.loginButton} onClick={() => navigate(PATHS.login)}>
+              <Button className={styles.loginButton} onClick={() => navigate(PATHS.login)}>
                 Login
-              </button>
+              </Button>
             </div>
           </>
         )}
@@ -161,7 +162,9 @@ const RegisterPage = () => {
               />
             </div>
             <center>
-              <button type="submit" className={styles.submitButton}>Register</button>
+            <Button type="submit" className={styles.submitButton}>
+              Register
+            </Button>
             </center>
             <p className={styles.footerText}>
                 Already have an account? <Link to={PATHS.login} className={styles.link}>Login</Link>

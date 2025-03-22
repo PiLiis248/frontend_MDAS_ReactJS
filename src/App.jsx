@@ -5,6 +5,7 @@ import RegisterPage from "./components/pages/RegisterPage";
 import MainLayout from "./layout/MainLayout";
 import PATHS from "./constants/path";
 import ResetPasswordPage from "./components/pages/ResetPasswordPage";
+import PublicRoute from "./router/PublicRoute";
 
 function App() {
   console.log("App is rendering...");
@@ -15,10 +16,10 @@ function App() {
         <Route path="/" element={<MainLayout />}>
           {/* Public Routes */}
           {/* <Route element={<PublicRoute />}> */}
-          <Route path={PATHS.login} element={<LoginPage />} />
-          <Route path={PATHS.register} element={<RegisterPage />} />
-          <Route path={PATHS.resetPassword} element={<ResetPasswordPage />} />
-        {/* </Route> */}
+            <Route path={PATHS.login} element={<LoginPage />} />
+            <Route path={PATHS.register} element={<RegisterPage />} />
+            <Route path={PATHS.resetPassword} element={<ResetPasswordPage />} />
+          {/* </Route> */}
 
           {/* <Route path={PATHS.login} element={<LoginPage />} /> */}
 
