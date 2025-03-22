@@ -6,6 +6,8 @@ import { Link, useNavigate } from "react-router-dom";
 import InputField from "../../common/InputField";
 import styles from "../../../assets/Auth.module.css";
 import PATHS from "../../../constants/path";
+import axiosInstance from "../../../api/axios";
+import ResendConfirmationButton from "../../common/ResendConfirmationButton";
 
 // Schema kiểm tra login
 const loginSchema = yup.object().shape({
@@ -22,8 +24,9 @@ const LoginPage = () => {
   const [rememberMe, setRememberMe] = useState(false);
   const [showModal, setShowModal] = useState(false);
   const [email, setEmail] = useState("");
-  const [resetMessage, setResetMessage] = useState(""); // Thông báo gửi mail
-  const [isResetSent, setIsResetSent] = useState(false); // Kiểm tra trạng thái gửi email thành công
+  const [resetMessage, setResetMessage] = useState(""); 
+  const [isResetSent, setIsResetSent] = useState(false); 
+  const [inactiveEmail, setInactiveEmail] = useState(null);
 
   const navigate = useNavigate();
   const { register, handleSubmit, formState: { errors } } = useForm({
@@ -32,28 +35,42 @@ const LoginPage = () => {
 
   const onSubmit = async (data) => {
     try {
-      console.log("Login Data:", data);
+      const response = await axiosInstance.post(`/login?username=${data.username}&password=${data.password}`);
+
+      const userData = response.data;
+
+      if (userData.status !== "ACTIVE") {
+        setInactiveEmail(userData.email); 
+        setError("Your account is not activated. Please check your email for activation. The token will expire after 10 days.");
+        return;
+      }
+      
+      if (!userData.token) {
+        setError("Authentication failed. Please try again.");
+        return;
+      }
+
+      console.log("Login successful:", userData);
       navigate(PATHS.manageGroup);
     } catch (err) {
-      setError(err.message);
+      console.error("Login Error:", err.response?.data || err.message);
+      setError(err.response?.data?.message || "Invalid username or password. Please try again.");
     }
   };
 
   // Xử lý gửi yêu cầu reset password
   const handleResetPassword = async () => {
     try {
-      setResetMessage(""); // Reset thông báo cũ
+      setResetMessage(""); 
       setIsResetSent(false);
-      const response = await fetch(`http://localhost:8080/api/v1/users/resetPasswordRequest?email=${email}`, {
-        method: "GET",
-      });
+      const response = await axiosInstance.get(`/users/resetPasswordRequest?email=${email}`);
 
-      if (!response.ok) {
+      if (response.status === 200) {
+        setResetMessage("✅ We have sent an email. Please check your email or spam!");
+        setIsResetSent(true);
+      } else {
         throw new Error("Failed to send reset password email. Please try again later.");
       }
-
-      setResetMessage("✅ We have sent an email. Please check your email or spam!");
-      setIsResetSent(true);
     } catch (error) {
       setResetMessage("❌ " + error.message);
     }
@@ -62,20 +79,24 @@ const LoginPage = () => {
   // Xử lý resend yêu cầu reset password
   const handleResendResetPassword = async () => {
     try {
-      setResetMessage(""); // Reset thông báo cũ
+      setResetMessage(""); 
 
-      const response = await fetch(`http://localhost:8080/api/v1/users/resendResetPassword?email=${email}`, {
-        method: "GET",
-      });
+      const response = await axiosInstance.get(`/users/resendResetPassword?email=${email}`);
 
-      if (!response.ok) {
+      if (response.status === 200) {
+        setResetMessage("✅ A new reset password email has been sent!");
+      } else {
         throw new Error("Failed to resend reset password email. Please try again.");
       }
-
-      setResetMessage("✅ A new reset password email has been sent!");
     } catch (error) {
       setResetMessage("❌ " + error.message);
     }
+  };
+
+  // Close modal and reset email input
+  const closeModal = () => {
+    setEmail("");
+    setShowModal(false);
   };
 
   return (
@@ -83,6 +104,22 @@ const LoginPage = () => {
       <div className={styles.authBox}>
         <h2 className={styles.title}>Login</h2>
         {error && <p className={styles.error}>{error}</p>}
+        <center>
+          {inactiveEmail && (
+            <div className={styles.buttonGroup}>
+              <ResendConfirmationButton email={inactiveEmail} />
+              <button 
+                className={styles.modalClose} 
+                onClick={() => {
+                  setInactiveEmail(null);
+                  setError(""); // Ẩn luôn thông báo lỗi
+                }}
+              >
+                Close
+              </button>
+            </div>
+          )}
+        </center>
         <form onSubmit={handleSubmit(onSubmit)} className={styles.form}>
           <InputField 
             label="Username" 
@@ -134,26 +171,23 @@ const LoginPage = () => {
             />
             {!isResetSent ? (
               <>
-              <button className={styles.modalButton} onClick={handleResetPassword}>
-                Send Reset Link
-              </button>
-              <button className={styles.modalClose} onClick={() => setShowModal(false)}>
-              Close
-            </button>
-            </>
+                <button className={styles.modalButton} onClick={handleResetPassword}>
+                  Send Reset Link
+                </button>
+                <button className={styles.modalClose} onClick={closeModal}>
+                  Close
+                </button>
+              </>
             ) : (
               <>
                 <button className={styles.modalButton} onClick={handleResendResetPassword}>
                   Resend
                 </button>
-                <button className={styles.modalClose} onClick={() => setShowModal(false)}>
+                <button className={styles.modalClose} onClick={closeModal}>
                   Login
                 </button>
               </>
             )}
-            {/* <button className={styles.modalClose} onClick={() => setShowModal(false)}>
-              Close
-            </button> */}
             {resetMessage && <p className={styles.resetMessage}>{resetMessage}</p>}
           </div>
         </div>

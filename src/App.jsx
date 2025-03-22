@@ -4,6 +4,7 @@ import LoginPage from "./components/pages/LoginPage";
 import RegisterPage from "./components/pages/RegisterPage";
 import MainLayout from "./layout/MainLayout";
 import PATHS from "./constants/path";
+import ResetPasswordPage from "./components/pages/ResetPasswordPage";
 
 function App() {
   console.log("App is rendering...");
@@ -16,7 +17,7 @@ function App() {
           {/* <Route element={<PublicRoute />}> */}
           <Route path={PATHS.login} element={<LoginPage />} />
           <Route path={PATHS.register} element={<RegisterPage />} />
-          {/* <Route path={PATHS.resetPassword} element={<ResetPasswordPage />} /> */}
+          <Route path={PATHS.resetPassword} element={<ResetPasswordPage />} />
         {/* </Route> */}
 
           {/* <Route path={PATHS.login} element={<LoginPage />} /> */}

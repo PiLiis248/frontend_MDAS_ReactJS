@@ -6,6 +6,8 @@ import { Link, useNavigate } from "react-router-dom";
 import InputField from "../../common/InputField";
 import styles from "../../../assets/Auth.module.css";
 import PATHS from "../../../constants/path";
+import axiosInstance from "../../../api/axios";
+import ResendConfirmationButton from "../../common/ResendConfirmationButton";
 
 // Schema kiểm tra đăng ký
 const registerSchema = yup.object().shape({
@@ -48,27 +50,27 @@ const RegisterPage = () => {
   const onSubmit = async (data) => {
     try {
       console.log("Register Data:", data);
-
       const { confirmPassword, ...requestData } = data;
+  
       setRegisteredEmail(data.email); // Lưu email để dùng cho "Resend Confirmation"
-
+  
       // Gọi API để đăng ký tài khoản
-      const response = await fetch("http://localhost:8080/api/v1/users", {
-        method: "POST",
+      const response = await axiosInstance.post("/users", requestData, {
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(requestData),
       });
-
-      const result = await response.text();
-      if (!response.ok) throw new Error(result.message || "Registration failed");
-
-      // Hiển thị thông báo thành công, không tự động chuyển trang
-      setSuccessMessage(result);
-      setError("");
+  
+      if (response.status === 200) {
+        setSuccessMessage(response.data.message || "Registration successful! Check your email.");
+        setError("");
+      } else {
+        throw new Error(response.data.message || "Registration failed");
+      }
+  
     } catch (err) {
-      setError(err.message);
+      setError(err.response?.data?.message || err.message);
     }
   };
+  
 
   const handleResendEmail = async () => {
     if (!registeredEmail) {
@@ -77,20 +79,20 @@ const RegisterPage = () => {
     }
   
     try {
-      const response = await fetch(`http://localhost:8080/api/v1/users/userRegistrationConfirmRequest?email=${registeredEmail}`, {
-        method: "GET",
-        headers: { "Content-Type": "application/json" },
-      });
+      const response = await axiosInstance.get(`/users/userRegistrationConfirmRequest?email=${registeredEmail}`);
   
-      const result = await response.text();
-      if (!response.ok) throw new Error(result || "Failed to resend email");
+      if (response.status === 200) {
+        setSuccessMessage("Confirmation email resent. Please check your email or spam folder!");
+        setError("");
+      } else {
+        throw new Error(response.data?.message || "Failed to resend email");
+      }
   
-      setSuccessMessage("Registered email has been resent. Please check email or spam !");
-      setError("");
     } catch (err) {
-      setError(err.message);
+      setError(err.response?.data?.message || err.message);
     }
   };
+  
   
 
   return (
@@ -103,9 +105,7 @@ const RegisterPage = () => {
           <>
             <p className={styles.success}>{successMessage}</p>
             <div className={styles.buttonGroup}>
-              <button className={styles.submitButton} onClick={handleResendEmail}>
-                Resend Confirmation Link
-              </button>
+              <ResendConfirmationButton email={registeredEmail} />
               <button className={styles.loginButton} onClick={() => navigate(PATHS.login)}>
                 Login
               </button>
