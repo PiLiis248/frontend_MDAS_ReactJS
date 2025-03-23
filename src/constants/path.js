@@ -5,6 +5,5 @@ const PATHS = {
   resetPassword: "/reset-password/:token",
   manageGroup: "/manage-group",
   profile: "/profile",
-  state: "/state",
 };
 export default PATHS;

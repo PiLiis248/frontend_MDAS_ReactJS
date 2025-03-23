@@ -6,7 +6,8 @@ import { useParams, useNavigate } from "react-router-dom";
 import InputField from "../../common/InputField";
 import styles from "../../../assets/Auth.module.css";
 import PATHS from "../../../constants/path";
-import axiosInstance from "../../../api/axios";
+import authService from "../../../services/authService"; // Import authService
+import Button from "../../common/Button";
 
 // Schema validation
 const resetPasswordSchema = yup.object().shape({
@@ -21,7 +22,6 @@ const ResetPasswordPage = () => {
   const [successMessage, setSuccessMessage] = useState("");
   const { token } = useParams(); // Lấy token từ URL
   const navigate = useNavigate();
-  console.log(token);
   
   const { register, handleSubmit, formState: { errors } } = useForm({
     resolver: yupResolver(resetPasswordSchema),
@@ -29,10 +29,7 @@ const ResetPasswordPage = () => {
 
   const onSubmit = async (data) => {
     try {
-      const response = await axiosInstance.get(
-        `/users/resetPassword?token=${token}&newPassword=${data.newPassword}`
-      );
-      
+      const response = await authService.resetPassword(token, data.newPassword); // Gọi API từ authService
 
       if (response.status === 200) {
         setSuccessMessage("✅ Password reset successfully!");
@@ -68,7 +65,7 @@ const ResetPasswordPage = () => {
           />
           <center>
             <Button type="submit" className={styles.submitButton}>
-              Reset Password
+              LASSGO
             </Button>
           </center>
         </form>

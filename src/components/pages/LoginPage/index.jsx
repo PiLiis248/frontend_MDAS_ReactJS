@@ -6,9 +6,9 @@ import { Link, useNavigate } from "react-router-dom";
 import InputField from "../../common/InputField";
 import styles from "../../../assets/Auth.module.css";
 import PATHS from "../../../constants/path";
-import axiosInstance from "../../../api/axios";
 import ResendConfirmationButton from "../../common/ResendConfirmationButton";
 import Button from "../../common/Button";
+import { authService } from "../../../services/authService"; // Import authService
 
 // Schema kiểm tra login
 const loginSchema = yup.object().shape({
@@ -34,25 +34,29 @@ const LoginPage = () => {
     resolver: yupResolver(loginSchema),
   });
 
+  // Xử lý đăng nhập
   const onSubmit = async (data) => {
     try {
-      const response = await axiosInstance.post(`/login?username=${data.username}&password=${data.password}`);
+      const response = await authService.login({
+        username: data.username,
+        password: data.password,
+      });
 
       const userData = response.data;
 
       if (userData.status !== "ACTIVE") {
-        setInactiveEmail(userData.email); 
-        setError("Your account is not activated. Please check your email for activation. The token will expire after 10 days.");
+        setInactiveEmail(userData.email);
+        setError("Your account is not activated. Please check your email.");
         return;
       }
-      
+
       if (!userData.token) {
         setError("Authentication failed. Please try again.");
         return;
       }
 
-       // 🔥 Lưu token vào localStorage
-      localStorage.setItem("token", userData.token);
+      const storage = rememberMe ? localStorage : sessionStorage;
+      storage.setItem("user", JSON.stringify(userData));
 
       console.log("Login successful:", userData);
       navigate(PATHS.manageGroup);
@@ -67,14 +71,9 @@ const LoginPage = () => {
     try {
       setResetMessage(""); 
       setIsResetSent(false);
-      const response = await axiosInstance.get(`/users/resetPasswordRequest?email=${email}`);
-
-      if (response.status === 200) {
-        setResetMessage("✅ We have sent an email. Please check your email or spam!");
-        setIsResetSent(true);
-      } else {
-        throw new Error("Failed to send reset password email. Please try again later.");
-      }
+      await authService.requestResetPassword(email);
+      setResetMessage("✅ We have sent an email. Please check your email or spam!");
+      setIsResetSent(true);
     } catch (error) {
       setResetMessage("❌ " + error.message);
     }
@@ -84,14 +83,8 @@ const LoginPage = () => {
   const handleResendResetPassword = async () => {
     try {
       setResetMessage(""); 
-
-      const response = await axiosInstance.get(`/users/resendResetPassword?email=${email}`);
-
-      if (response.status === 200) {
-        setResetMessage("✅ A new reset password email has been sent!");
-      } else {
-        throw new Error("Failed to resend reset password email. Please try again.");
-      }
+      await authService.resendResetPassword(email);
+      setResetMessage("✅ A new reset password email has been sent!");
     } catch (error) {
       setResetMessage("❌ " + error.message);
     }
@@ -106,7 +99,7 @@ const LoginPage = () => {
   return (
     <div className={styles.authContainer}>
       <div className={styles.authBox}>
-        <h2 className={styles.title}>Login</h2>
+        <h2 className={styles.title}>LOGIN</h2>
         {error && <p className={styles.error}>{error}</p>}
         <center>
           {inactiveEmail && (
@@ -126,7 +119,7 @@ const LoginPage = () => {
         </center>
         <form onSubmit={handleSubmit(onSubmit)} className={styles.form}>
           <InputField 
-            label="Username" 
+            label="Username"
             register={register("username")} 
             error={errors.username?.message} 
             placeholder="Enter your username"
@@ -140,12 +133,12 @@ const LoginPage = () => {
           />
           <div className={styles.rememberMeContainer}>
             <label>
-            <InputField 
-              type="checkbox" 
-              label="Remember me"
-              checked={rememberMe} 
-              onChange={() => setRememberMe(!rememberMe)} 
-            />
+              <InputField 
+                type="checkbox" 
+                label="Remember me"
+                checked={rememberMe} 
+                onChange={() => setRememberMe(!rememberMe)} 
+              />
             </label>
             <Link type="button" className={styles.link} onClick={() => setShowModal(true)}>
               Forgot Password?
@@ -153,7 +146,7 @@ const LoginPage = () => {
           </div>
           <center>
           <Button type="submit" className={styles.submitButton}>
-            Login
+            LASSGO
           </Button>
           </center>
         </form>
@@ -170,7 +163,6 @@ const LoginPage = () => {
             <p>Enter your email to receive a password reset link:</p>
             <InputField
               type="email"
-              label="Email"
               value={email}
               onChange={(e) => setEmail(e.target.value)}
               placeholder="Enter your email"

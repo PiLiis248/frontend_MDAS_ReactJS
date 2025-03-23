@@ -1,7 +1,7 @@
-import React from 'react'
+import React from "react";
 
-export const ManageGroupPage = () => {
-  return (
-    <div>ManageGroupPage</div>
-  )
-}
+const ManageGroupPage = () => {
+  return <div>Manage Group Page</div>;
+};
+
+export default ManageGroupPage;

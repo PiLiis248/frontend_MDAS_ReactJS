@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import axiosInstance from "../../../api/axios";
+import authService from "../../../services/authService";
 import styles from "../../../assets/Auth.module.css";
 
 const ResendConfirmationButton = ({ email }) => {
@@ -13,9 +13,7 @@ const ResendConfirmationButton = ({ email }) => {
     }
 
     try {
-      const response = await axiosInstance.get(
-        `/users/userRegistrationConfirmRequest?email=${email}`
-      );
+      const response = await authService.resendConfirmationEmail(email);
 
       if (response.status === 200) {
         setMessage("Confirmation email resent. Please check your email or spam folder!");

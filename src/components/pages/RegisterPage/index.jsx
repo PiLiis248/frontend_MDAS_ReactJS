@@ -6,7 +6,7 @@ import { Link, useNavigate } from "react-router-dom";
 import InputField from "../../common/InputField";
 import styles from "../../../assets/Auth.module.css";
 import PATHS from "../../../constants/path";
-import axiosInstance from "../../../api/axios";
+import authService from "../../../services/authService"; 
 import ResendConfirmationButton from "../../common/ResendConfirmationButton";
 import Button from "../../common/Button";
 
@@ -42,7 +42,7 @@ const registerSchema = yup.object().shape({
 const RegisterPage = () => {
   const [error, setError] = useState("");
   const [successMessage, setSuccessMessage] = useState("");
-  const [registeredEmail, setRegisteredEmail] = useState(""); // Lưu email của user vừa đăng ký
+  const [registeredEmail, setRegisteredEmail] = useState(""); 
   const navigate = useNavigate();
   const { register, handleSubmit, formState: { errors } } = useForm({
     resolver: yupResolver(registerSchema),
@@ -52,56 +52,47 @@ const RegisterPage = () => {
     try {
       console.log("Register Data:", data);
       const { confirmPassword, ...requestData } = data;
-  
-      setRegisteredEmail(data.email); // Lưu email để dùng cho "Resend Confirmation"
-  
-      // Gọi API để đăng ký tài khoản
-      const response = await axiosInstance.post("/users", requestData, {
-        headers: { "Content-Type": "application/json" },
-      });
-  
+      setRegisteredEmail(data.email);
+
+      // Gọi API qua authService
+      const response = await authService.register(requestData); 
+
       if (response.status === 200) {
         setSuccessMessage(response.data.message || "Registration successful! Check your email.");
         setError("");
       } else {
         throw new Error(response.data.message || "Registration failed");
       }
-  
     } catch (err) {
       setError(err.response?.data?.message || err.message);
     }
   };
-  
 
   const handleResendEmail = async () => {
     if (!registeredEmail) {
       setError("No registered email found.");
       return;
     }
-  
+
     try {
-      const response = await axiosInstance.get(`/users/userRegistrationConfirmRequest?email=${registeredEmail}`);
-  
+      const response = await authService.resendConfirmationEmail(registeredEmail);
+
       if (response.status === 200) {
         setSuccessMessage("Confirmation email resent. Please check your email or spam folder!");
         setError("");
       } else {
         throw new Error(response.data?.message || "Failed to resend email");
       }
-  
     } catch (err) {
       setError(err.response?.data?.message || err.message);
     }
   };
-  
-  
 
   return (
     <div className={styles.authContainer}>
       <div className={styles.registerAuthBox}>
-        <h2 className={styles.title}>Register</h2>
+        <h2 className={styles.title}>REGISTER</h2>
 
-        {/* Hiển thị thông báo thành công */}
         {successMessage && (
           <>
             <p className={styles.success}>{successMessage}</p>
@@ -114,10 +105,8 @@ const RegisterPage = () => {
           </>
         )}
 
-        {/* Hiển thị thông báo lỗi */}
         {error && <p className={styles.error}>{error}</p>}
 
-        {/* Ẩn form nếu đăng ký thành công */}
         {!successMessage && (
           <form onSubmit={handleSubmit(onSubmit)} className={styles.form}>
             <div className={styles.gridContainer}>
@@ -162,16 +151,15 @@ const RegisterPage = () => {
               />
             </div>
             <center>
-            <Button type="submit" className={styles.submitButton}>
-              Register
-            </Button>
+              <Button type="submit" className={styles.submitButton}>
+                LASSGO
+              </Button>
             </center>
             <p className={styles.footerText}>
-                Already have an account? <Link to={PATHS.login} className={styles.link}>Login</Link>
+              Already have an account? <Link to={PATHS.login} className={styles.link}>Login</Link>
             </p>
           </form>
         )}
-
       </div>
     </div>
   );

@@ -2,10 +2,13 @@
 import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
 import LoginPage from "./components/pages/LoginPage";
 import RegisterPage from "./components/pages/RegisterPage";
+import ManageGroupPage from "./components/pages/ManageGroupPage";
+import ProfilePage from "./components/pages/ProfilePage";
 import MainLayout from "./layout/MainLayout";
 import PATHS from "./constants/path";
 import ResetPasswordPage from "./components/pages/ResetPasswordPage";
 import PublicRoute from "./router/PublicRoute";
+import PrivateRoute from "./router/PrivateRoute";
 
 function App() {
   console.log("App is rendering...");
@@ -25,12 +28,10 @@ function App() {
 
           {/* Private Routes */}
           {/* <Route element={<PrivateRoute />}> */}
-          {/* <Route path={routes.manageGroup} element={<ManageGroupPage />} /> */}
-          {/* <Route path={routes.profile} element={<ProfilePage />} /> */}
+            <Route path={PATHS.manageGroup} element={<ManageGroupPage />} />
+            <Route path={PATHS.profile} element={<ProfilePage />} />
           {/* </Route> */}
 
-          {/* Trang thông báo (Ai cũng vào được) */}
-          {/* <Route path={routes.state} element={<StatePage />} /> */}
         </Route>
       </Routes>
     </Router>

@@ -4,7 +4,7 @@
   align-items: center;
   width: 100vw;
   height: 100vh;
-  background-image: url("./img/login_bg.jpg");
+  background: url("./img/login_bg.jpg");
 }
 
 .authBox, .registerAuthBox {
@@ -53,15 +53,17 @@
 .link {
   text-align: center;
   margin-top: 12px;
-  color: lightskyblue;
+  color: rgb(202, 242, 4);
   transition: .2s ease-in-out;
 }
 
 .link:hover {
-  color: rgb(7, 249, 245);
+  text-decoration: underline;
+  color: rgb(249, 184, 7);
 }
 
 .footerText {
+  color: white;
   text-align: center;
 }
 
@@ -92,6 +94,7 @@
   color: black;
   margin-bottom: 10px;
 }
+
 
 .modalInput {
   width: 95%;
