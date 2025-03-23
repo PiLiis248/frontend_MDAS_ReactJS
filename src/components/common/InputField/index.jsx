@@ -1,13 +1,13 @@
 import React from "react";
-import styles from "../../../assets/InputField.module.css";
+import "../../../assets/InputField.css";
 
 const InputField = ({ label, type = "text", register, value, onChange, checked, error, placeholder }) => {
   return (
-    <div className={styles.inputContainer}>
-      <label className={styles.label}>
+    <div className="inputContainer">
+      <label className="label">
         {type === "checkbox" ? (
           <>
-            <input type="checkbox" {...(register ? register : { checked, onChange })} className={styles.checkbox} />
+            <input type="checkbox" {...(register ? register : { checked, onChange })} className="checkbox" />
             {label}
           </>
         ) : (
@@ -16,13 +16,13 @@ const InputField = ({ label, type = "text", register, value, onChange, checked, 
             <input
               type={type}
               {...(register ? register : { value, onChange })}
-              className={styles.input}
+              className="input"
               placeholder={placeholder}
             />
           </>
         )}
       </label>
-      {error && <p className={styles.error}>{error}</p>}
+      {error && <p className="error">{error}</p>}
     </div>
   );
 };

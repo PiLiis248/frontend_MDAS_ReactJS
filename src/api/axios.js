@@ -7,9 +7,7 @@ const axiosInstance = axios.create({
 });
 
 axiosInstance.interceptors.response.use(
-  (response) => {
-    return response;
-  },
+  (response) => response,
   async (error) => {
     const originalRequest = error.config;
     if (error.response?.status === 403 && !originalRequest._retry) {
@@ -31,16 +29,29 @@ axiosInstance.interceptors.response.use(
 
 axiosInstance.interceptors.request.use(
   (config) => {
-    const accessToken = tokenMethod.get()?.token;
+    const accessToken = localStorage.getItem("token") || sessionStorage.getItem("token");
     if (accessToken) {
       config.headers["Authorization"] = `Bearer ${accessToken}`;
     }
     return config;
   },
-  (error) => {
-    console.error("Request Error:", error);
-    return Promise.reject(error);
-  }
+  (error) => Promise.reject(error)
 );
+
+// Phương thức logout
+export const logout = async () => {
+  try {
+    // Gửi yêu cầu POST tới server (nếu cần)
+    await axiosInstance.post("/logout");
+  } catch (error) {
+    console.error("Error during logout:", error);
+  } finally {
+    // Xóa token khỏi storage
+    localStorage.removeItem("user");
+    localStorage.removeItem("token");
+    sessionStorage.removeItem("user");
+    sessionStorage.removeItem("token");
+  }
+};
 
 export default axiosInstance;

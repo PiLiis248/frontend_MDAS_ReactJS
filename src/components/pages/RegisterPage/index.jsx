@@ -4,7 +4,7 @@ import { yupResolver } from "@hookform/resolvers/yup";
 import * as yup from "yup";
 import { Link, useNavigate } from "react-router-dom";
 import InputField from "../../common/InputField";
-import styles from "../../../assets/Auth.module.css";
+import "../../../assets/Auth.css";
 import PATHS from "../../../constants/path";
 import authService from "../../../services/authService"; 
 import ResendConfirmationButton from "../../common/ResendConfirmationButton";
@@ -89,27 +89,27 @@ const RegisterPage = () => {
   };
 
   return (
-    <div className={styles.authContainer}>
-      <div className={styles.registerAuthBox}>
-        <h2 className={styles.title}>REGISTER</h2>
+    <div className="authContainer">
+      <div className="registerAuthBox">
+        <h2 className="title">REGISTER</h2>
 
         {successMessage && (
           <>
-            <p className={styles.success}>{successMessage}</p>
-            <div className={styles.buttonGroup}>
+            <p className="success">{successMessage}</p>
+            <div className="buttonGroup">
               <ResendConfirmationButton email={registeredEmail} />
-              <Button className={styles.loginButton} onClick={() => navigate(PATHS.login)}>
+              <Button className="loginButton" onClick={() => navigate(PATHS.login)}>
                 Login
               </Button>
             </div>
           </>
         )}
 
-        {error && <p className={styles.error}>{error}</p>}
+        {error && <p className="error">{error}</p>}
 
         {!successMessage && (
-          <form onSubmit={handleSubmit(onSubmit)} className={styles.form}>
-            <div className={styles.gridContainer}>
+          <form onSubmit={handleSubmit(onSubmit)} className="form">
+            <div className="gridContainer">
               <InputField 
                 label="Username" 
                 register={register("userName")} 
@@ -151,12 +151,12 @@ const RegisterPage = () => {
               />
             </div>
             <center>
-              <Button type="submit" className={styles.submitButton}>
+              <Button type="submit" className="submitButton">
                 LASSGO
               </Button>
             </center>
-            <p className={styles.footerText}>
-              Already have an account? <Link to={PATHS.login} className={styles.link}>Login</Link>
+            <p className="footerText">
+              Already have an account? <Link to={PATHS.login} className="link">Login</Link>
             </p>
           </form>
         )}

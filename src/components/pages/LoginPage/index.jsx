@@ -4,7 +4,7 @@ import { yupResolver } from "@hookform/resolvers/yup";
 import * as yup from "yup";
 import { Link, useNavigate } from "react-router-dom";
 import InputField from "../../common/InputField";
-import styles from "../../../assets/Auth.module.css";
+import "../../../assets/Auth.css";
 import PATHS from "../../../constants/path";
 import ResendConfirmationButton from "../../common/ResendConfirmationButton";
 import Button from "../../common/Button";
@@ -56,8 +56,10 @@ const LoginPage = () => {
       }
 
       const storage = rememberMe ? localStorage : sessionStorage;
-      storage.setItem("user", JSON.stringify(userData));
+      storage.setItem("token", userData.token); // Lưu token vào storage
+      storage.setItem("user", JSON.stringify(userData)); // Lưu thông tin user
 
+      console.log("token after login: " + storage.getItem("token"));
       console.log("Login successful:", userData);
       navigate(PATHS.manageGroup);
     } catch (err) {
@@ -97,16 +99,16 @@ const LoginPage = () => {
   };
 
   return (
-    <div className={styles.authContainer}>
-      <div className={styles.authBox}>
-        <h2 className={styles.title}>LOGIN</h2>
-        {error && <p className={styles.error}>{error}</p>}
+    <div className="authContainer">
+      <div className="authBox">
+        <h2 className="title">LOGIN</h2>
+        {error && <p className="error">{error}</p>}
         <center>
           {inactiveEmail && (
-            <div className={styles.buttonGroup}>
+            <div className="buttonGroup">
               <ResendConfirmationButton email={inactiveEmail} />
               <Button 
-                className={styles.modalClose} 
+                className="modalClose"
                 onClick={() => {
                   setInactiveEmail(null);
                   setError(""); // Ẩn luôn thông báo lỗi
@@ -117,7 +119,7 @@ const LoginPage = () => {
             </div>
           )}
         </center>
-        <form onSubmit={handleSubmit(onSubmit)} className={styles.form}>
+        <form onSubmit={handleSubmit(onSubmit)} className="form">
           <InputField 
             label="Username"
             register={register("username")} 
@@ -131,7 +133,7 @@ const LoginPage = () => {
             error={errors.password?.message} 
             placeholder="Enter your password"
           />
-          <div className={styles.rememberMeContainer}>
+          <div className="rememberMeContainer">
             <label>
               <InputField 
                 type="checkbox" 
@@ -140,25 +142,25 @@ const LoginPage = () => {
                 onChange={() => setRememberMe(!rememberMe)} 
               />
             </label>
-            <Link type="button" className={styles.link} onClick={() => setShowModal(true)}>
+            <Link type="button" className="link" onClick={() => setShowModal(true)}>
               Forgot Password?
             </Link>
           </div>
           <center>
-          <Button type="submit" className={styles.submitButton}>
+          <Button type="submit" className="submitButton">
             LASSGO
           </Button>
           </center>
         </form>
-        <p className={styles.footerText}>
-          Don't have an account? <Link to={PATHS.register} className={styles.link}>Register</Link>
+        <p className="footerText">
+          Don't have an account? <Link to={PATHS.register} className="link">Register</Link>
         </p>
       </div>
 
       {/* Modal Forgot Password */}
       {showModal && (
-        <div className={styles.modalOverlay}>
-          <div className={styles.modal}>
+        <div className="modalOverlay">
+          <div className="modal">
             <h3>Reset Password</h3>
             <p>Enter your email to receive a password reset link:</p>
             <InputField
@@ -169,24 +171,24 @@ const LoginPage = () => {
             />
             {!isResetSent ? (
               <>
-                <Button className={styles.modalButton} onClick={handleResetPassword}>
+                <Button className="modalButton" onClick={handleResetPassword}>
                   Send Reset Link
                 </Button>
-                <Button className={styles.modalClose} onClick={closeModal}>
+                <Button className="modalClose" onClick={closeModal}>
                   Close
                 </Button>
               </>
             ) : (
               <>
-                <Button className={styles.modalButton} onClick={handleResendResetPassword}>
+                <Button className="modalButton" onClick={handleResendResetPassword}>
                   Resend
                 </Button>
-                <Button className={styles.modalClose} onClick={closeModal}>
+                <Button className="modalClose" onClick={closeModal}>
                   Login
                 </Button>
               </>
             )}
-            {resetMessage && <p className={styles.resetMessage}>{resetMessage}</p>}
+            {resetMessage && <p className="resetMessage">{resetMessage}</p>}
           </div>
         </div>
       )}

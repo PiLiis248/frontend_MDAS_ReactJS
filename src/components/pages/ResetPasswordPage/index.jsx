@@ -4,7 +4,7 @@ import { yupResolver } from "@hookform/resolvers/yup";
 import * as yup from "yup";
 import { useParams, useNavigate } from "react-router-dom";
 import InputField from "../../common/InputField";
-import styles from "../../../assets/Auth.module.css";
+import "../../../assets/Auth.css";
 import PATHS from "../../../constants/path";
 import authService from "../../../services/authService"; // Import authService
 import Button from "../../common/Button";
@@ -43,12 +43,12 @@ const ResetPasswordPage = () => {
   };
 
   return (
-    <div className={styles.authContainer}>
-      <div className={styles.authBox}>
-        <h2 className={styles.title}>Reset Password</h2>
-        {error && <p className={styles.error}>{error}</p>}
-        {successMessage && <p className={styles.success}>{successMessage}</p>}
-        <form onSubmit={handleSubmit(onSubmit)} className={styles.form}>
+    <div className="authContainer">
+      <div className="authBox">
+        <h2 className="title">Reset Password</h2>
+        {error && <p className="error">{error}</p>}
+        {successMessage && <p className="success">{successMessage}</p>}
+        <form onSubmit={handleSubmit(onSubmit)} className="form">
           <InputField
             label="New Password"
             type="password"
@@ -64,7 +64,7 @@ const ResetPasswordPage = () => {
             placeholder="Confirm new password"
           />
           <center>
-            <Button type="submit" className={styles.submitButton}>
+            <Button type="submit" className="submitButton">
               LASSGO
             </Button>
           </center>

@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 import authService from "../../../services/authService";
-import styles from "../../../assets/Auth.module.css";
+import "../../../assets/Auth.css";
 
 const ResendConfirmationButton = ({ email }) => {
   const [message, setMessage] = useState("");
@@ -28,9 +28,9 @@ const ResendConfirmationButton = ({ email }) => {
 
   return (
     <div>
-      {message && <p className={styles.success}>{message}</p>}
-      {error && <p className={styles.error}>{error}</p>}
-      <button className={styles.submitButton} onClick={handleResendEmail}>
+      {message && <p className="success">{message}</p>}
+      {error && <p className="error">{error}</p>}
+      <button className="submitButton" onClick={handleResendEmail}>
         Resend Confirmation Link
       </button>
     </div>

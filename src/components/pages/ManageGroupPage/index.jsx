@@ -1,7 +1,12 @@
 import React from "react";
+import Sidebar from "../../common/Sidebar";
 
 const ManageGroupPage = () => {
-  return <div>Manage Group Page</div>;
+  return (
+    <div>
+      <Sidebar />
+    </div>
+  );
 };
 
 export default ManageGroupPage;
