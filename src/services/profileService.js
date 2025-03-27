@@ -10,11 +10,16 @@ const profileService = {
   changePassword(payload = {}) {
     return axiosInstance.put("/users/changePassword", payload);
   },
-  uploadAvatar(file) {
-    return axiosInstance.post("/files/image", file, {
+  uploadAvatar(file, email) {
+    const formData = new FormData();
+    formData.append("image", file);
+    formData.append("email", email); // Thêm email vào FormData
+  
+    return axiosInstance.post("/files/image", formData, {
       headers: { "Content-Type": "multipart/form-data" },
     });
-  },
+  }
+  
 };
 
 export default profileService;

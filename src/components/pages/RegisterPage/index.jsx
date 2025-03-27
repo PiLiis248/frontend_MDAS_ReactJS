@@ -15,8 +15,7 @@ const registerSchema = yup.object().shape({
   userName: yup.string()
     .required("Username is required")
     .min(6, "Username must be at least 6 characters")
-    .max(50, "Username must be at most 50 characters")
-    .matches(/^[a-zA-Z0-9_]+$/, "Username can only contain letters, numbers, and underscores"),
+    .max(50, "Username must be at most 50 characters"),
   email: yup.string()
     .email("Invalid email")
     .min(6, "Email must be at least 6 characters")
@@ -50,11 +49,9 @@ const RegisterPage = () => {
 
   const onSubmit = async (data) => {
     try {
-      console.log("Register Data:", data);
       const { confirmPassword, ...requestData } = data;
       setRegisteredEmail(data.email);
 
-      // Gọi API qua authService
       const response = await authService.register(requestData); 
 
       if (response.status === 200) {
@@ -62,26 +59,6 @@ const RegisterPage = () => {
         setError("");
       } else {
         throw new Error(response.data.message || "Registration failed");
-      }
-    } catch (err) {
-      setError(err.response?.data?.message || err.message);
-    }
-  };
-
-  const handleResendEmail = async () => {
-    if (!registeredEmail) {
-      setError("No registered email found.");
-      return;
-    }
-
-    try {
-      const response = await authService.resendConfirmationEmail(registeredEmail);
-
-      if (response.status === 200) {
-        setSuccessMessage("Confirmation email resent. Please check your email or spam folder!");
-        setError("");
-      } else {
-        throw new Error(response.data?.message || "Failed to resend email");
       }
     } catch (err) {
       setError(err.response?.data?.message || err.message);
@@ -97,7 +74,10 @@ const RegisterPage = () => {
           <>
             <p className="success">{successMessage}</p>
             <div className="buttonGroup">
-              <ResendConfirmationButton email={registeredEmail} />
+              <ResendConfirmationButton 
+                email={registeredEmail} 
+                onSuccessMessageChange={setSuccessMessage} 
+              />
               <Button className="loginButton" onClick={() => navigate(PATHS.login)}>
                 Login
               </Button>

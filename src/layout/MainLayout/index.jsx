@@ -1,12 +1,13 @@
 import { Outlet } from "react-router-dom";
-import AuthContextProvider from "../../constants/AuthContext";
+import { AuthProvider } from "../../constants/AuthContext";
+
 const MainLayout = () => {
   return (
-    <AuthContextProvider>
+    <AuthProvider>
       <div className="page__wrapper">
         <Outlet />
       </div>
-    </AuthContextProvider>
+    </AuthProvider>
   );
 };
 

@@ -1,0 +1,48 @@
+/* ManageGroupPage.css */
+
+.manage-group-container {
+  display: flex;
+  height: 100vh;
+  width: 100vw;
+  background-color: #ecf0f1;
+  overflow: hidden;
+}
+
+.manage-group-content {
+    flex: 3;
+    display: flex;
+    padding: 30px;
+    gap: 20px;
+    background-color: #f7f7f7;
+  }
+
+.table-container {
+    width: 100%;
+    margin-top: 20px;
+    padding: 20px;
+    background-color: #fff;
+    color: black;
+    border-radius: 8px;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+  }
+  
+  table {
+    width: 100%;
+    border-collapse: collapse;
+  }
+  
+  table th, table td {
+    padding: 10px;
+    text-align: left;
+    border-bottom: 1px solid #ddd;
+  }
+  
+  table th {
+    background-color: #f4f4f4;
+    font-weight: bold;
+  }
+  
+  table tr:hover {
+    background-color: #f1f1f1;
+  }
+  

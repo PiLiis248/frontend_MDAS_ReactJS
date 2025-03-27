@@ -4,7 +4,8 @@
   align-items: center;
   width: 100vw;
   height: 100vh;
-  background: url("./img/login_bg.jpg");
+  background: url("./img/login_bg.jpg") no-repeat;
+  background-size: cover;
 }
 
 .authBox, .registerAuthBox {
@@ -81,7 +82,7 @@
 }
 
 /* Modal Box */
-.modal {
+.modalForgotPassword {
   background: white;
   padding: 20px;
   border-radius: 10px;
@@ -90,11 +91,10 @@
   box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.2);
 }
 
-.modal h3, .modal p {
+.modalForgotPassword h3, .modalForgotPassword p {
   color: black;
   margin-bottom: 10px;
 }
-
 
 .modalInput {
   width: 95%;

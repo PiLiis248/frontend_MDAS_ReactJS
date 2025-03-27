@@ -1,26 +1,29 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { useForm } from "react-hook-form";
 import { yupResolver } from "@hookform/resolvers/yup";
 import * as yup from "yup";
-import { Link, useNavigate } from "react-router-dom";
+import { Link } from "react-router-dom";
 import InputField from "../../common/InputField";
 import "../../../assets/Auth.css";
+import { useAuth } from "../../../constants/AuthContext";
 import PATHS from "../../../constants/path";
 import ResendConfirmationButton from "../../common/ResendConfirmationButton";
 import Button from "../../common/Button";
-import { authService } from "../../../services/authService"; // Import authService
+import authService from "../../../services/authService"; 
 
-// Schema kiểm tra login
 const loginSchema = yup.object().shape({
-  username: yup.string()
-    .required("Username is required")
-    .max(50, "Username must be at most 50 characters"),
+  userName: yup.string()
+      .required("Username is required")
+      .min(6, "Username must be at least 6 characters")
+      .max(50, "Username must be at most 50 characters"),
   password: yup.string()
-    .required("Password is required")
-    .min(6, "Password must be at least 6 characters"),
+      .required("Password is required")
+      .min(6, "Password must be at least 6 characters")
+      .max(800, "Password is too long"),
 });
 
 const LoginPage = () => {
+  const { login } = useAuth();
   const [error, setError] = useState("");
   const [rememberMe, setRememberMe] = useState(false);
   const [showModal, setShowModal] = useState(false);
@@ -28,47 +31,39 @@ const LoginPage = () => {
   const [resetMessage, setResetMessage] = useState(""); 
   const [isResetSent, setIsResetSent] = useState(false); 
   const [inactiveEmail, setInactiveEmail] = useState(null);
+  const [isLoading, setIsLoading] = useState(false);
 
-  const navigate = useNavigate();
   const { register, handleSubmit, formState: { errors } } = useForm({
     resolver: yupResolver(loginSchema),
   });
 
-  // Xử lý đăng nhập
+  useEffect(() => {
+    if (error) {
+      const timer = setTimeout(() => {
+        setError("");
+      }, 5000); 
+  
+      return () => clearTimeout(timer); // Xóa timer nếu component unmount
+    }
+  }, [error]);
+  
+
   const onSubmit = async (data) => {
+    setIsLoading(true);
+    setError(""); // Clear any previous errors
     try {
-      const response = await authService.login({
-        username: data.username,
-        password: data.password,
-      });
-
-      const userData = response.data;
-
-      if (userData.status !== "ACTIVE") {
-        setInactiveEmail(userData.email);
-        setError("Your account is not activated. Please check your email.");
-        return;
-      }
-
-      if (!userData.token) {
-        setError("Authentication failed. Please try again.");
-        return;
-      }
-
-      const storage = rememberMe ? localStorage : sessionStorage;
-      storage.setItem("token", userData.token); // Lưu token vào storage
-      storage.setItem("user", JSON.stringify(userData)); // Lưu thông tin user
-
-      console.log("token after login: " + storage.getItem("token"));
-      console.log("Login successful:", userData);
-      navigate(PATHS.manageGroup);
+      await login(data.userName, data.password, rememberMe);
     } catch (err) {
-      console.error("Login Error:", err.response?.data || err.message);
-      setError(err.response?.data?.message || "Invalid username or password. Please try again.");
+      // Handle different types of login errors
+      if (err.message.includes("not activated")) {
+        setInactiveEmail(data.userName);
+      }
+      setError(err.message || "Invalid username or password. Please try again.");
+    } finally {
+      setIsLoading(false);
     }
   };
 
-  // Xử lý gửi yêu cầu reset password
   const handleResetPassword = async () => {
     try {
       setResetMessage(""); 
@@ -81,7 +76,6 @@ const LoginPage = () => {
     }
   };
 
-  // Xử lý resend yêu cầu reset password
   const handleResendResetPassword = async () => {
     try {
       setResetMessage(""); 
@@ -92,7 +86,6 @@ const LoginPage = () => {
     }
   };
 
-  // Close modal and reset email input
   const closeModal = () => {
     setEmail("");
     setShowModal(false);
@@ -102,7 +95,34 @@ const LoginPage = () => {
     <div className="authContainer">
       <div className="authBox">
         <h2 className="title">LOGIN</h2>
-        {error && <p className="error">{error}</p>}
+        {error && (
+          <div 
+            style={{
+              width: 'fit-content',
+              position: 'fixed', 
+              top: '20px', 
+              left: '50%', 
+              transform: 'translateX(-50%)', 
+              backgroundColor: 'rgba(255, 0, 0, 0.8)', 
+              color: 'white', 
+              padding: '15px', 
+              borderRadius: '8px',
+              zIndex: 1000,
+              boxShadow: '0 4px 6px rgba(0,0,0,0.1)',
+              animation: 'fadeInOut 2s ease-in-out'
+            }}
+          >
+            {error}
+          </div>
+        )}
+        <style>{`
+          @keyframes fadeInOut {
+            0% { opacity: 0; transform: translateX(-50%) translateY(-20px); }
+            10% { opacity: 1; transform: translateX(-50%) translateY(0); }
+            90% { opacity: 1; transform: translateX(-50%) translateY(0); }
+            100% { opacity: 0; transform: translateX(-50%) translateY(-20px); }
+          }
+        `}</style>
         <center>
           {inactiveEmail && (
             <div className="buttonGroup">
@@ -111,7 +131,7 @@ const LoginPage = () => {
                 className="modalClose"
                 onClick={() => {
                   setInactiveEmail(null);
-                  setError(""); // Ẩn luôn thông báo lỗi
+                  setError(""); 
                 }}
               >
                 Close
@@ -122,8 +142,8 @@ const LoginPage = () => {
         <form onSubmit={handleSubmit(onSubmit)} className="form">
           <InputField 
             label="Username"
-            register={register("username")} 
-            error={errors.username?.message} 
+            register={register("userName")} 
+            error={errors.userName?.message} 
             placeholder="Enter your username"
           />
           <InputField 
@@ -135,20 +155,24 @@ const LoginPage = () => {
           />
           <div className="rememberMeContainer">
             <label>
-              <InputField 
-                type="checkbox" 
-                label="Remember me"
+              <input
+                type="checkbox"
                 checked={rememberMe} 
-                onChange={() => setRememberMe(!rememberMe)} 
+                onChange={() => setRememberMe(!rememberMe)}
               />
+              Remember me
             </label>
             <Link type="button" className="link" onClick={() => setShowModal(true)}>
               Forgot Password?
             </Link>
           </div>
           <center>
-          <Button type="submit" className="submitButton">
-            LASSGO
+          <Button 
+            type="submit" 
+            className="submitButton"
+            disabled={isLoading}
+          >
+            {isLoading ? 'Logging in...' : 'LASSGO'}
           </Button>
           </center>
         </form>
@@ -160,7 +184,7 @@ const LoginPage = () => {
       {/* Modal Forgot Password */}
       {showModal && (
         <div className="modalOverlay">
-          <div className="modal">
+          <div className="modalForgotPassword">
             <h3>Reset Password</h3>
             <p>Enter your email to receive a password reset link:</p>
             <InputField

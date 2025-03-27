@@ -1,31 +1,33 @@
-import Cookies from "js-cookie";
 export const localToken = {
-  get: () => JSON.parse(localStorage.getItem('token')),
-  set: (token) => localStorage.setItem('token', JSON.stringify(token)),
-  remove: () => localStorage.removeItem('token'),
+  get: () => JSON.parse(localStorage.getItem("authData")),
+  set: (data) => localStorage.setItem("authData", JSON.stringify(data)),
+  remove: () => localStorage.removeItem("authData"),
 };
 
-export const cookieToken = {
-  get: () =>
-    JSON.parse(
-      Cookies.get('token') !== undefined
-        ? Cookies.get('token')
-        : null
-    ),
-  set: (token) => Cookies.set('token', JSON.stringify(token)),
-  remove: () => Cookies.remove('token'),
+export const sessionToken = {
+  get: () => JSON.parse(sessionStorage.getItem("authData")),
+  set: (data) => sessionStorage.setItem("authData", JSON.stringify(data)),
+  remove: () => sessionStorage.removeItem("authData"),
 };
 
 const tokenMethod = {
   get: () => {
-    return cookieToken.get();
+    return sessionToken.get() || localToken.get();
   },
-  set: (token) => {
-    cookieToken.set(token);
+  set: (data, rememberMe = false) => {
+    if (rememberMe) {
+      localToken.set(data);
+    } else {
+      sessionToken.set(data);
+    }
   },
   remove: () => {
-    cookieToken.remove();
+    localToken.remove();
+    sessionToken.remove();
   },
+  getToken: () => {
+    return tokenMethod.get()?.token || null;
+  }
 };
 
 export default tokenMethod;

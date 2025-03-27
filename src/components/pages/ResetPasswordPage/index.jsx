@@ -6,12 +6,15 @@ import { useParams, useNavigate } from "react-router-dom";
 import InputField from "../../common/InputField";
 import "../../../assets/Auth.css";
 import PATHS from "../../../constants/path";
-import authService from "../../../services/authService"; // Import authService
+import authService from "../../../services/authService"; 
 import Button from "../../common/Button";
 
 // Schema validation
 const resetPasswordSchema = yup.object().shape({
-  newPassword: yup.string().required("Enter new password").min(6, "Password must be at least 6 characters"),
+  newPassword: yup.string()
+      .required("Password is required")
+      .min(6, "Password must be at least 6 characters")
+      .max(800, "Password is too long"),
   confirmPassword: yup.string()
     .oneOf([yup.ref("newPassword"), null], "Passwords must match")
     .required("Confirm your new password"),

@@ -1,7 +1,6 @@
 import React, { useState, useEffect, useRef } from "react";
 import "../../../assets/Profile.css";
 import Sidebar from "../../common/Sidebar";
-import defaultAvatar from "../../../assets/img/g.jpg";
 import ProfileService from "../../../services/profileService";
 import Button from "../../common/Button";
 import InputField from "../../common/InputField"; // Import InputField component
@@ -10,7 +9,7 @@ import authService from "../../../services/authService"; // Import authService f
 
 const ProfilePage = () => {
   const [user, setUser] = useState({
-    avatarUrl: defaultAvatar,
+    avatarUrl: null,
     userName: "",
     email: "",
     firstName: "",
@@ -52,18 +51,16 @@ const ProfilePage = () => {
   const handleAvatarChange = async (e) => {
     const file = e.target.files[0];
     if (file) {
-      const url = URL.createObjectURL(file);
-      setUser((prev) => ({ ...prev, avatarUrl: url }));
-
       try {
-        const response = await ProfileService.uploadAvatar(file);
-        setUser((prev) => ({ ...prev, avatarUrl: response.data.avatarUrl }));
+        const response = await ProfileService.uploadAvatar(file, user.email); 
+        setUser((prev) => ({ ...prev, avatarUrl: response.data })); 
         setSuccess("Avatar updated successfully!");
       } catch (error) {
         setError("Failed to update avatar.");
       }
     }
   };
+  
 
   const triggerFileInput = () => {
     if (fileInputRef.current) {
@@ -180,7 +177,7 @@ const ProfilePage = () => {
 
             <div className="avatar-column">
               <label htmlFor="avatarInput" className="avatar-section">
-                <img src={user.avatarUrl} alt="Profile Avatar" className="avatar" />
+                <img src={`/Avatars/${user.avatarUrl}`} alt="Profile Avatar" className="avatar" />
                 <input
                   type="file"
                   ref={fileInputRef}

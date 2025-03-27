@@ -2,7 +2,7 @@
 const PATHS = {
   login: "/login",
   register: "/register",
-  resetPassword: "/reset-password/:token",
+  resetPassword: "/auth/new-password/:token",
   manageGroup: "/manage-group",
   profile: "/profile",
 };
