@@ -142,6 +142,12 @@ const ManageGroupPage = () => {
     }
   };
 
+  const refreshForm = () => {
+    setSearchTerm("");
+    setMinMembers("");
+    setMaxMembers("");
+  }
+
   // Toggle group selection
   const toggleGroupSelection = (groupId) => {
     setSelectedGroups(prev => 
@@ -193,6 +199,12 @@ const ManageGroupPage = () => {
                 disabled={selectedGroups.length === 0}
               >
                 Delete ({selectedGroups.length})
+              </Button>
+              <Button 
+                className="reload-group-btn" 
+                onClick={() => refreshForm()}
+              >
+                Reload
               </Button>
             </div>
           </div>

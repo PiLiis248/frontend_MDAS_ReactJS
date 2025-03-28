@@ -210,7 +210,8 @@ table td button:hover {
 }
 
 .create-group-btn, 
-.delete-group-btn {
+.delete-group-btn, 
+.reload-group-btn {
   padding: 10px 15px;
   border: none;
   border-radius: 8px;
@@ -235,6 +236,15 @@ table td button:hover {
 
 .delete-group-btn:hover {
   background-color: #c0392b;
+}
+
+.reload-group-btn {
+  background-color: #FFE7B5;
+  color: white;
+}
+
+.reload-group-btn:hover {
+  background-color: #CA864B;
 }
 
 /* Modal Styles */
