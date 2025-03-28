@@ -3,12 +3,12 @@ import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
 import LoginPage from "./components/pages/LoginPage";
 import RegisterPage from "./components/pages/RegisterPage";
 import ManageGroupPage from "./components/pages/ManageGroupPage";
-import ProfilePage from "./components/pages/ProfilePage";
 import MainLayout from "./layout/MainLayout";
 import PATHS from "./constants/path";
 import ResetPasswordPage from "./components/pages/ResetPasswordPage";
 import PublicRoute from "./router/PublicRoute";
 import PrivateRoute from "./router/PrivateRoute";
+import ProfileSidebar from "./components/pages/ProfileSideBar";
 
 function App() {
   console.log("App is rendering...");
@@ -18,19 +18,18 @@ function App() {
       <Routes>
         <Route path="/" element={<MainLayout />}>
           {/* Public Routes */}
-          {/* <Route element={<PublicRoute />}> */}
+          <Route element={<PublicRoute />}>
             <Route path={PATHS.login} element={<LoginPage />} />
             <Route path={PATHS.register} element={<RegisterPage />} />
             <Route path={PATHS.resetPassword} element={<ResetPasswordPage />} />
-          {/* </Route> */}
+          </Route>
 
           {/* <Route path={PATHS.login} element={<LoginPage />} /> */}
 
           {/* Private Routes */}
-          {/* <Route element={<PrivateRoute />}> */}
+          <Route element={<PrivateRoute />}>
             <Route path={PATHS.manageGroup} element={<ManageGroupPage />} />
-            <Route path={PATHS.profile} element={<ProfilePage />} />
-          {/* </Route> */}
+          </Route>
 
         </Route>
       </Routes>

@@ -1,0 +1,75 @@
+.navbar {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 15px 30px;
+  background-color: #439FDB;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.navbar-left {
+  display: flex;
+  align-items: center;
+}
+
+.user-profile {
+  display: flex;
+  align-items: center;
+}
+
+.user-avatar {
+  width: 60px;
+  height: 60px;
+  border-radius: 50%;
+  margin-right: 15px;
+  object-fit: cover;
+  border: 2px solid #dee2e6;
+}
+
+.user-info {
+  display: flex;
+  flex-direction: column;
+}
+
+.username {
+  font-size: 1.5em;
+  font-weight: 600;
+  color: #333;
+  margin-bottom: 10px;
+}
+
+.view-profile-btn {
+  background-color: #D18CDD;
+  color: white;
+  border: none;
+  padding: 8px 15px;
+  border-radius: 5px;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+  font-size: 14px;
+  width: fit-content;
+}
+
+.view-profile-btn:hover {
+  background-color: #8400C5;
+}
+
+.navbar-right {
+  display: flex;
+  align-items: center;
+}
+
+.logout-btn {
+  background-color: #FAC7EE;
+  color: white;
+  border: none;
+  padding: 10px 20px;
+  border-radius: 5px;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+  font-size: 16px;
+}
+
+.logout-btn:hover {
+  background-color: #BB1F58;
+}

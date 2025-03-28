@@ -4,13 +4,14 @@ import { yupResolver } from "@hookform/resolvers/yup";
 import * as yup from "yup";
 import { Link, useNavigate } from "react-router-dom";
 import InputField from "../../common/InputField";
+import Toast from "../../common/Toast"; 
 import "../../../assets/Auth.css";
 import PATHS from "../../../constants/path";
 import authService from "../../../services/authService"; 
 import ResendConfirmationButton from "../../common/ResendConfirmationButton";
 import Button from "../../common/Button";
 
-// Schema kiểm tra đăng ký
+// Schema kiểm tra đăng ký (remains the same)
 const registerSchema = yup.object().shape({
   userName: yup.string()
     .required("Username is required")
@@ -39,15 +40,24 @@ const registerSchema = yup.object().shape({
 });
 
 const RegisterPage = () => {
+  const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState("");
   const [successMessage, setSuccessMessage] = useState("");
   const [registeredEmail, setRegisteredEmail] = useState(""); 
+  const [toastMessage, setToastMessage] = useState("");
+  const [toastType, setToastType] = useState("");
   const navigate = useNavigate();
   const { register, handleSubmit, formState: { errors } } = useForm({
     resolver: yupResolver(registerSchema),
   });
 
+  const showToast = (message, type) => {
+    setToastMessage(message);
+    setToastType(type);
+  };
+
   const onSubmit = async (data) => {
+    setIsLoading(true);
     try {
       const { confirmPassword, ...requestData } = data;
       setRegisteredEmail(data.email);
@@ -55,18 +65,33 @@ const RegisterPage = () => {
       const response = await authService.register(requestData); 
 
       if (response.status === 200) {
-        setSuccessMessage(response.data.message || "Registration successful! Check your email.");
+        const successMsg = response.data.message || "Registration successful! Check your email.";
+        setSuccessMessage(successMsg);
+        showToast(successMsg, "success");
         setError("");
       } else {
         throw new Error(response.data.message || "Registration failed");
       }
     } catch (err) {
-      setError(err.response?.data?.message || err.message);
+      const errorMsg = err.response?.data?.message || err.message;
+      setError(errorMsg);
+      showToast(errorMsg, "error");
+    } finally {
+      setIsLoading(false);
     }
   };
 
   return (
     <div className="authContainer">
+      {/* Toast for displaying messages */}
+      {toastMessage && (
+        <Toast 
+          message={toastMessage} 
+          type={toastType} 
+          onClose={() => setToastMessage("")} 
+        />
+      )}
+
       <div className="registerAuthBox">
         <h2 className="title">REGISTER</h2>
 
@@ -84,8 +109,6 @@ const RegisterPage = () => {
             </div>
           </>
         )}
-
-        {error && <p className="error">{error}</p>}
 
         {!successMessage && (
           <form onSubmit={handleSubmit(onSubmit)} className="form">
@@ -131,9 +154,13 @@ const RegisterPage = () => {
               />
             </div>
             <center>
-              <Button type="submit" className="submitButton">
-                LASSGO
-              </Button>
+            <Button 
+              type="submit" 
+              className="submitRegisterButton"
+              disabled={isLoading}
+            >
+              {isLoading ? 'Registering...' : 'LASSGO'}
+            </Button>
             </center>
             <p className="footerText">
               Already have an account? <Link to={PATHS.login} className="link">Login</Link>

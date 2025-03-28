@@ -9,6 +9,7 @@ import { useAuth } from "../../../constants/AuthContext";
 import PATHS from "../../../constants/path";
 import ResendConfirmationButton from "../../common/ResendConfirmationButton";
 import Button from "../../common/Button";
+import Toast from "../../common/Toast";
 import authService from "../../../services/authService"; 
 
 const loginSchema = yup.object().shape({
@@ -25,6 +26,7 @@ const loginSchema = yup.object().shape({
 const LoginPage = () => {
   const { login } = useAuth();
   const [error, setError] = useState("");
+  const [toast, setToast] = useState(null);
   const [rememberMe, setRememberMe] = useState(false);
   const [showModal, setShowModal] = useState(false);
   const [email, setEmail] = useState("");
@@ -36,29 +38,25 @@ const LoginPage = () => {
   const { register, handleSubmit, formState: { errors } } = useForm({
     resolver: yupResolver(loginSchema),
   });
-
-  useEffect(() => {
-    if (error) {
-      const timer = setTimeout(() => {
-        setError("");
-      }, 5000); 
   
-      return () => clearTimeout(timer); // Xóa timer nếu component unmount
-    }
-  }, [error]);
-  
+  const showToast = (message, type) => {
+    setToast({ message, type });
+  };
 
   const onSubmit = async (data) => {
     setIsLoading(true);
     setError(""); // Clear any previous errors
     try {
       await login(data.userName, data.password, rememberMe);
+      showToast("Login successful!", "success");
     } catch (err) {
       // Handle different types of login errors
       if (err.message.includes("not activated")) {
         setInactiveEmail(data.userName);
+        showToast("Account not activated", "error");
+      } else {
+        showToast(err.message || "Invalid username or password", "error");
       }
-      setError(err.message || "Invalid username or password. Please try again.");
     } finally {
       setIsLoading(false);
     }
@@ -69,9 +67,11 @@ const LoginPage = () => {
       setResetMessage(""); 
       setIsResetSent(false);
       await authService.requestResetPassword(email);
+      showToast("Reset password email sent!", "success");
       setResetMessage("✅ We have sent an email. Please check your email or spam!");
       setIsResetSent(true);
     } catch (error) {
+      showToast(error.message, "error");
       setResetMessage("❌ " + error.message);
     }
   };
@@ -80,8 +80,10 @@ const LoginPage = () => {
     try {
       setResetMessage(""); 
       await authService.resendResetPassword(email);
+      showToast("New reset password email sent!", "success");
       setResetMessage("✅ A new reset password email has been sent!");
     } catch (error) {
+      showToast(error.message, "error");
       setResetMessage("❌ " + error.message);
     }
   };
@@ -93,36 +95,18 @@ const LoginPage = () => {
 
   return (
     <div className="authContainer">
+      {/* Toast Notification */}
+      {toast && (
+        <Toast 
+          message={toast.message} 
+          type={toast.type} 
+          onClose={() => setToast(null)}
+        />
+      )}
+
       <div className="authBox">
         <h2 className="title">LOGIN</h2>
-        {error && (
-          <div 
-            style={{
-              width: 'fit-content',
-              position: 'fixed', 
-              top: '20px', 
-              left: '50%', 
-              transform: 'translateX(-50%)', 
-              backgroundColor: 'rgba(255, 0, 0, 0.8)', 
-              color: 'white', 
-              padding: '15px', 
-              borderRadius: '8px',
-              zIndex: 1000,
-              boxShadow: '0 4px 6px rgba(0,0,0,0.1)',
-              animation: 'fadeInOut 2s ease-in-out'
-            }}
-          >
-            {error}
-          </div>
-        )}
-        <style>{`
-          @keyframes fadeInOut {
-            0% { opacity: 0; transform: translateX(-50%) translateY(-20px); }
-            10% { opacity: 1; transform: translateX(-50%) translateY(0); }
-            90% { opacity: 1; transform: translateX(-50%) translateY(0); }
-            100% { opacity: 0; transform: translateX(-50%) translateY(-20px); }
-          }
-        `}</style>
+        {error && <p className="error">{error}</p>}
         <center>
           {inactiveEmail && (
             <div className="buttonGroup">
@@ -169,7 +153,7 @@ const LoginPage = () => {
           <center>
           <Button 
             type="submit" 
-            className="submitButton"
+            className="submitLoginButton"
             disabled={isLoading}
           >
             {isLoading ? 'Logging in...' : 'LASSGO'}

@@ -1,10 +1,9 @@
 import { Navigate, Outlet } from "react-router-dom";
+import tokenMethod from "../api/token";
 
 const PublicRoute = () => {
-  const user = JSON.parse(localStorage.getItem("user")) || JSON.parse(sessionStorage.getItem("user"));
-  const isAuthenticated = user?.token;
-
-  return isAuthenticated ? <Navigate to="/profile" replace /> : <Outlet />;
+  const isAuthenticated = tokenMethod.getToken();
+  return isAuthenticated ? <Navigate to="/manage-group" replace /> : <Outlet />;
 };
 
 export default PublicRoute;

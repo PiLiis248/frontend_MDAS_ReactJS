@@ -4,7 +4,7 @@
   align-items: center;
   width: 100vw;
   height: 100vh;
-  background: url("./img/login_bg.jpg") no-repeat;
+  background: url("./img/background.png") no-repeat;
   background-size: cover;
 }
 
@@ -27,17 +27,19 @@
   display: flex;
   justify-content: space-between;
   margin-bottom: 1rem;
+  color: black;
 }
 
 .title {
+  color: black;
   text-align: center;
-  font-size: 24px;
+  font-size: 2em;
   font-weight: bold;
+  margin: 0 0 2rem 0;
 }
 
 .button {
   width: 100%;
-  background-color: #007bff;
   color: white;
   padding: 10px;
   border: none;
@@ -47,24 +49,33 @@
   margin-top: 10px;
 }
 
-.button:hover {
-  background-color: #0056b3;
+.submitLoginButton, .submitRegisterButton {
+  border: none;
+  background-color: #D4E1EE;
+  color: #4F4C4D;
+  transition: .2s ease-in-out;
+}
+
+.submitLoginButton:hover, .submitRegisterButton:hover {
+  border: none;
+  background-color: #6EA1C8;
+  color: white;
 }
 
 .link {
   text-align: center;
   margin-top: 12px;
-  color: rgb(202, 242, 4);
+  color: #2F89CA;
   transition: .2s ease-in-out;
 }
 
 .link:hover {
   text-decoration: underline;
-  color: rgb(249, 184, 7);
+  color: #143E5E;
 }
 
 .footerText {
-  color: white;
+  color: black;
   text-align: center;
 }
 
