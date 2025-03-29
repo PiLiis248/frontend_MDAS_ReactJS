@@ -159,7 +159,13 @@ const RegisterPage = () => {
               className="submitRegisterButton"
               disabled={isLoading}
             >
-              {isLoading ? 'Registering...' : 'LASSGO'}
+              {isLoading ? (
+                <span className="loading-indicator">
+                  <span className="loading-spinner"></span> Processing...
+                </span>
+              ) : (
+                "Register"
+              )}
             </Button>
             </center>
             <p className="footerText">

@@ -25,7 +25,6 @@ export const AuthProvider = ({ children }) => {
   const login = async (username, password, rememberMe) => {
     try {
       const userData = await authService.login(username, password, rememberMe, setUser);
-
       if (!userData) {
         throw new Error("Your account has not been registered !");
       }

@@ -26,7 +26,7 @@ axiosInstance.interceptors.response.use(
     if (error.response && error.response.status === 401) {
       console.warn("Token expired, logging out...");
       tokenMethod.remove();
-      window.location.href = PATHS.login;
+      // window.location.href = PATHS.login;
     }
     return Promise.reject(error);
   }

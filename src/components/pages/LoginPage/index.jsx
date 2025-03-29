@@ -156,7 +156,13 @@ const LoginPage = () => {
             className="submitLoginButton"
             disabled={isLoading}
           >
-            {isLoading ? 'Logging in...' : 'LASSGO'}
+            {isLoading ? (
+                <span className="loading-indicator">
+                  <span className="loading-spinner"></span> Processing...
+                </span>
+              ) : (
+                "Login"
+              )}
           </Button>
           </center>
         </form>

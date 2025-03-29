@@ -9,7 +9,6 @@ const authService = {
       const response = await axiosInstance.post(
         `/login?username=${encodeURIComponent(username)}&password=${encodeURIComponent(password)}`
       );
-
       const authData = {
         token: response.data.token,
         user: {

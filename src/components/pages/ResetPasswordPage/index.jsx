@@ -8,6 +8,7 @@ import "../../../assets/Auth.css";
 import PATHS from "../../../constants/path";
 import authService from "../../../services/authService"; 
 import Button from "../../common/Button";
+import Toast from "../../common/Toast";
 
 // Schema validation
 const resetPasswordSchema = yup.object().shape({
@@ -21,36 +22,53 @@ const resetPasswordSchema = yup.object().shape({
 });
 
 const ResetPasswordPage = () => {
-  const [error, setError] = useState("");
-  const [successMessage, setSuccessMessage] = useState("");
-  const { token } = useParams(); // Lấy token từ URL
+  const [isLoading, setIsLoading] = useState(false);
+  const [notification, setNotification] = useState(null);
+  const { token } = useParams();
   const navigate = useNavigate();
   
   const { register, handleSubmit, formState: { errors } } = useForm({
     resolver: yupResolver(resetPasswordSchema),
   });
 
+  // Show notification helper
+  const showNotification = (message, type) => {
+    setNotification({ message, type });
+    setTimeout(() => setNotification(null), 3000);
+  };
+
   const onSubmit = async (data) => {
     try {
-      const response = await authService.resetPassword(token, data.newPassword); // Gọi API từ authService
+      setIsLoading(true);
+      const response = await authService.resetPassword(token, data.newPassword);
 
       if (response.status === 200) {
-        setSuccessMessage("✅ Password reset successfully!");
+        showNotification("Password reset successfully!", "success");
         setTimeout(() => navigate(PATHS.login), 2000);
       } else {
-        setError("❌ Failed to reset password. Please try again.");
+        showNotification("Failed to reset password. Please try again.", "error");
       }
     } catch (err) {
-      setError(err.response?.data?.error || "❌ Invalid or expired token!");
+      const errorMessage = err.response?.data?.error || "Invalid or expired token!";
+      showNotification(errorMessage, "error");
+    } finally {
+      setIsLoading(false);
     }
   };
 
   return (
     <div className="authContainer">
+      {/* Notification Toast */}
+      {notification && (
+        <Toast 
+          message={notification.message} 
+          type={notification.type}
+          onClose={() => setNotification(null)}
+        />
+      )}
+      
       <div className="authBox">
         <h2 className="title">Reset Password</h2>
-        {error && <p className="error">{error}</p>}
-        {successMessage && <p className="success">{successMessage}</p>}
         <form onSubmit={handleSubmit(onSubmit)} className="form">
           <InputField
             label="New Password"
@@ -67,8 +85,18 @@ const ResetPasswordPage = () => {
             placeholder="Confirm new password"
           />
           <center>
-            <Button type="submit" className="submitButton">
-              LASSGO
+            <Button 
+              type="submit" 
+              className="submitButton"
+              disabled={isLoading}
+            >
+              {isLoading ? (
+                <span className="loading-indicator">
+                  <span className="loading-spinner"></span> Processing...
+                </span>
+              ) : (
+                "Reset Password"
+              )}
             </Button>
           </center>
         </form>

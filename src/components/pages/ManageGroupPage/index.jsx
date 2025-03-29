@@ -29,9 +29,13 @@ const ManageGroupPage = () => {
 
   // Create and delete group states
   const [isCreateModalOpen, setIsCreateModalOpen] = useState(false);
+  const [isEditModalOpen, setIsEditModalOpen] = useState(false);
   const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
   const [newGroupName, setNewGroupName] = useState("");
   const [selectedGroups, setSelectedGroups] = useState([]);
+  const [editingGroup, setEditingGroup] = useState(null);
+  const [editGroupName, setEditGroupName] = useState("");
+  const [editTotalMember, setEditTotalMember] = useState("");
 
   // Notification states
   const [notification, setNotification] = useState(null);
@@ -95,6 +99,11 @@ const ManageGroupPage = () => {
       return;
     }
 
+    if (newGroupName.length > 50) {
+      showNotification("Group name must be 50 characters or less", "error");
+      return;
+    }
+
     try {
       await groupService.createGroup({ name: newGroupName });
       
@@ -111,6 +120,53 @@ const ManageGroupPage = () => {
       console.error("Error creating group", error);
       showNotification("Failed to create group", "error");
     }
+  };
+
+  // Edit group handler
+  const handleEditGroup = async () => {
+    if (!editGroupName.trim()) {
+      showNotification("Group name cannot be empty", "error");
+      return;
+    }
+
+    if (editGroupName.length > 50) {
+      showNotification("Group name must be 50 characters or less", "error");
+      return;
+    }
+
+    try {
+      const payload = {
+        name: editGroupName,
+        totalMember: editTotalMember !== "" ? parseInt(editTotalMember) : undefined
+      };
+      
+      await groupService.editGroup(editingGroup.id, payload);
+      
+      // Refetch groups to update the list
+      await fetchGroups();
+      
+      closeEditModal();
+      showNotification("Group updated successfully", "success");
+    } catch (error) {
+      console.error("Error updating group", error);
+      showNotification("Failed to update group", "error");
+    }
+  };
+
+  // Open edit modal
+  const openEditModal = (group) => {
+    setEditingGroup(group);
+    setEditGroupName(group.name);
+    setEditTotalMember(group.totalMember?.toString() || "");
+    setIsEditModalOpen(true);
+  };
+
+  // Close edit modal
+  const closeEditModal = () => {
+    setIsEditModalOpen(false);
+    setEditingGroup(null);
+    setEditGroupName("");
+    setEditTotalMember("");
   };
 
   // Delete group handler
@@ -164,6 +220,7 @@ const ManageGroupPage = () => {
 
   return (
     <div className="manage-group-container">
+      <div className={`cover ${isProfileSidebarOpen ? 'active' : ''}`}></div>
       {/* Notification */}
       {notification && (
         <Toast 
@@ -246,7 +303,9 @@ const ManageGroupPage = () => {
           </div>
 
           {isLoading ? (
-            <p>Loading groups...</p>
+            <span className="loading-indicator">
+              <span className="loading-spinner"></span> Processing...
+            </span>
           ) : error ? (
             <p className="error-message">{error}</p>
           ) : groups.length === 0 ? (
@@ -299,8 +358,7 @@ const ManageGroupPage = () => {
                       <td>{group.name}</td>
                       <td>{group.totalMember || 0}</td>
                       <td>
-                        <Button>View</Button>
-                        <Button>Edit</Button>
+                        <Button onClick={() => openEditModal(group)}>Edit</Button>
                       </td>
                     </tr>
                   ))}
@@ -343,6 +401,33 @@ const ManageGroupPage = () => {
             <div className="modal-actions">
               <Button onClick={handleCreateGroup}>Create</Button>
               <Button onClick={() => setIsCreateModalOpen(false)}>Cancel</Button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Edit Group Modal */}
+      {isEditModalOpen && editingGroup && (
+        <div className="modal-overlay edit-group">
+          <div className="modal">
+            <h2>Edit Group</h2>
+            <InputField 
+              label="Group Name"
+              type="text"
+              value={editGroupName}
+              onChange={(e) => setEditGroupName(e.target.value)}
+              placeholder="Enter group name"
+            />
+            <InputField 
+              label="Total Members"
+              type="number"
+              value={editTotalMember}
+              onChange={(e) => setEditTotalMember(e.target.value)}
+              placeholder="Enter total members"
+            />
+            <div className="modal-actions">
+              <Button onClick={handleEditGroup}>Save Changes</Button>
+              <Button onClick={closeEditModal}>Cancel</Button>
             </div>
           </div>
         </div>

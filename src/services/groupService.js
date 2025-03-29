@@ -42,6 +42,11 @@ const groupService = {
   // delete in backend if delete 1 group then it will be .../groups/15 , if delete groups then .../groups/1,2,4,15
   deleteGroup(ids) {
     return axiosInstance.delete(`/groups/${ids}`);
+  },
+
+  // edit update name and totalMember of that group via its id
+  editGroup(id, payload = {}) {
+    return axiosInstance.put(`/groups/${id}`, payload);
   }
 };
 
