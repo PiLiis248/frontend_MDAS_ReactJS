@@ -53,7 +53,7 @@ const LoginPage = () => {
       // Handle different types of login errors
       if (err.message.includes("not activated")) {
         setInactiveEmail(data.userName);
-        showToast("Account not activated", "error");
+        showToast("Your account is not activated", "error");
       } else {
         showToast(err.message || "Invalid username or password", "error");
       }
