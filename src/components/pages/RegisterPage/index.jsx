@@ -24,11 +24,9 @@ const registerSchema = yup.object().shape({
     .required("Email is required"),
   firstName: yup.string()
     .required("First name is required")
-    .matches(/^[A-Za-z]+$/, "First name can only contain letters")
     .max(50, "First name must be at most 50 characters"),
   lastName: yup.string()
     .required("Last name is required")
-    .matches(/^[A-Za-z]+$/, "Last name can only contain letters")
     .max(50, "Last name must be at most 50 characters"),
   password: yup.string()
     .required("Password is required")
