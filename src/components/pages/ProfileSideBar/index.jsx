@@ -1,59 +1,60 @@
-import React, { useState, useEffect, useRef } from "react";
-import ProfileService from "../../../services/profileService";
+import React, { useEffect, useRef, useState } from "react";
+import { useDispatch, useSelector } from "react-redux";
+import * as Yup from 'yup';
 import Button from "../../common/Button";
 import Toast from "../../common/Toast";
 import "../../../assets/ProfileSidebar.css";
-import authService from "../../../services/authService";
-import * as Yup from 'yup';
 import InputField from "../../common/InputField";
 import { 
   UserIcon, 
-  AtSignIcon, 
   BriefcaseIcon, 
   MailIcon 
 } from 'lucide-react';
 
-const ProfileSidebar = ({ isOpen, onClose }) => {
-  const [user, setUser] = useState({
-    avatarUrl: "",
-    userName: "",
-    email: "",
-    firstName: "",
-    lastName: "",
-    role: "",
-  });
+import { 
+  fetchUserProfile,
+  uploadAvatar,
+  changePassword,
+  requestResetPassword,
+  togglePasswordModal,
+  updatePasswordField,
+  setPasswordErrors,
+  clearToast
+} from "../../../redux/features/profileSlice";
 
-  const [isLoading, setIsLoading] = useState(true);
+const ProfileSidebar = ({ isOpen, onClose }) => {
+  const dispatch = useDispatch();
+  const { 
+    user, 
+    isProfileLoading,
+    isAvatarUploading,
+    isChangePasswordModalOpen,
+    isResetPasswordLoading,
+    isForgotPasswordLoading,
+    passwordForm,
+    toast
+  } = useSelector((state) => state.profile);
+
   const [isClosing, setIsClosing] = useState(false);
   const fileInputRef = useRef(null);
 
-  // Password change states
-  const [isChangePasswordModalOpen, setIsChangePasswordModalOpen] = useState(false);
-  const [oldPassword, setOldPassword] = useState("");
-  const [newPassword, setNewPassword] = useState("");
-  const [confirmNewPassword, setConfirmNewPassword] = useState("");
-  const [error, setError] = useState("");
-  const [success, setSuccess] = useState("");
-
-  // Separate loading states for each button
-  const [isResetPasswordLoading, setIsResetPasswordLoading] = useState(false);
-  const [isForgotPasswordLoading, setIsForgotPasswordLoading] = useState(false);
-
-  // Password error states
-  const [oldPasswordError, setOldPasswordError] = useState("");
-  const [newPasswordError, setNewPasswordError] = useState("");
-  const [confirmNewPasswordError, setConfirmNewPasswordError] = useState("");
-
-  // Toast state
-  const [toast, setToast] = useState({
-    message: '',
-    type: '',
-    isVisible: false
-  });
+  useEffect(() => {
+    if (isOpen) {
+      dispatch(fetchUserProfile());
+    } else {
+      dispatch(togglePasswordModal(false));
+    }
+  }, [isOpen, dispatch]);
 
   // Modify the close handler to add closing animation
   const handleClose = () => {
     setIsClosing(true);
+    
+    // Close the password modal first if it's open
+    if (isChangePasswordModalOpen) {
+      dispatch(togglePasswordModal(false));
+    }
+    
     // Delay the actual closing to allow animation to complete
     setTimeout(() => {
       setIsClosing(false);
@@ -61,50 +62,13 @@ const ProfileSidebar = ({ isOpen, onClose }) => {
     }, 500); // Should match the CSS animation duration
   };
 
-  useEffect(() => {
-    const fetchUserProfile = async () => {
-      try {
-        const response = await ProfileService.getProfile();
-        let userData = response.data;
-
-        if (userData.avatarUrl === null) {
-          userData = { ...userData, avatarUrl: "hearts.jpg" };
-        }
-
-        setUser(userData);
-        setIsLoading(false);
-      } catch (err) {
-        console.error("Failed to load user profile");
-        setIsLoading(false);
-      }
-    };
-
-    if (isOpen) {
-      fetchUserProfile();
-    }
-  }, [isOpen]);
-
-  const handleAvatarChange = async (e) => {
+  const handleAvatarChange = (e) => {
     const file = e.target.files[0];
     if (file) {
-      try {
-        const response = await ProfileService.uploadAvatar(file, user.email);
-        setUser((prev) => ({ ...prev, avatarUrl: response.data }));
-        setToast({
-          message: 'Avatar updated successfully!',
-          type: 'success',
-          isVisible: true
-        });
-        setTimeout(() => {
-          window.location.reload();
-        }, 3000);
-      } catch (error) {
-        setToast({
-          message: 'Failed to update avatar.',
-          type: 'error',
-          isVisible: true
-        });
-      }
+      dispatch(uploadAvatar({ file, email: user.email }));
+      setTimeout(() => {
+        window.location.reload();
+      }, 3000);
     }
   };
 
@@ -115,19 +79,15 @@ const ProfileSidebar = ({ isOpen, onClose }) => {
   };
 
   const openChangePasswordModal = () => {
-    setIsChangePasswordModalOpen(true);
+    dispatch(togglePasswordModal(true));
   };
 
   const closeChangePasswordModal = () => {
-    setIsChangePasswordModalOpen(false);
-    setOldPassword("");
-    setNewPassword("");
-    setConfirmNewPassword("");
-    setOldPasswordError("");
-    setNewPasswordError("");
-    setConfirmNewPasswordError("");
-    setError("");
-    setSuccess("");
+    dispatch(togglePasswordModal(false));
+  };
+
+  const handlePasswordInputChange = (field) => (e) => {
+    dispatch(updatePasswordField({ field, value: e.target.value }));
   };
 
   const validatePassword = async () => {
@@ -142,87 +102,44 @@ const ProfileSidebar = ({ isOpen, onClose }) => {
     });
 
     try {
-      await schema.validate({ oldPassword, newPassword, confirmNewPassword }, { abortEarly: false });
-      return true;  
+      await schema.validate({
+        oldPassword: passwordForm.oldPassword,
+        newPassword: passwordForm.newPassword,
+        confirmNewPassword: passwordForm.confirmNewPassword
+      }, { abortEarly: false });
+      return true;
     } catch (err) {
       const errorMessages = err.inner.reduce((acc, currentErr) => {
         acc[currentErr.path] = currentErr.message;
         return acc;
       }, {});
 
-      setOldPasswordError(errorMessages.oldPassword || "");
-      setNewPasswordError(errorMessages.newPassword || "");
-      setConfirmNewPasswordError(errorMessages.confirmNewPassword || "");
+      dispatch(setPasswordErrors({
+        oldPasswordError: errorMessages.oldPassword || "",
+        newPasswordError: errorMessages.newPassword || "",
+        confirmNewPasswordError: errorMessages.confirmNewPassword || ""
+      }));
 
-      return false;  
+      return false;
     }
   };
 
   const handleSubmitPasswordChange = async () => {
     const isValid = await validatePassword();
-    if (!isValid) return;  
+    if (!isValid) return;
 
-    try {
-      setIsResetPasswordLoading(true);
-      const payload = { 
-        email: user.email, 
-        oldPassword, 
-        newPassword 
-      };
-  
-      await ProfileService.changePassword(payload);
-      setToast({
-        message: 'Password changed successfully!',
-        type: 'success',
-        isVisible: true
-      });
-      setTimeout(() => {
-        closeChangePasswordModal();
-      }, 2000);
-    } catch (err) {
-      setToast({
-        message: err.response?.data || "Failed to change password.",
-        type: 'error',
-        isVisible: true
-      });
-    } finally {
-      setIsResetPasswordLoading(false);
-    }
+    dispatch(changePassword({
+      email: user.email,
+      oldPassword: passwordForm.oldPassword,
+      newPassword: passwordForm.newPassword
+    }));
   };
 
-  const handleForgotPasswordSubmit = async () => {
-    try {
-      setIsForgotPasswordLoading(true);
-      await authService.requestResetPassword(user.email);
-      setToast({
-        message: 'Reset password link has been sent to email. Please check email or spam!',
-        type: 'success',
-        isVisible: true
-      });
-    } catch (err) {
-      setToast({
-        message: 'Failed to send reset password link. Please try again.',
-        type: 'error',
-        isVisible: true
-      });
-    } finally {
-      setIsForgotPasswordLoading(false);
-    }
+  const handleForgotPasswordSubmit = () => {
+    dispatch(requestResetPassword(user.email));
   };
 
-  const renderToast = () => {
-    if (!toast.isVisible) return null;
-
-    return (
-      <Toast 
-        message={toast.message}
-        type={toast.type}
-        onClose={() => setToast({ ...toast, isVisible: false })}
-      />
-    );
-  };
-
-  if (isLoading) return null;
+  if (isProfileLoading) return null;
 
   return (
     <div 
@@ -251,8 +168,9 @@ const ProfileSidebar = ({ isOpen, onClose }) => {
           <Button 
             className="change-avatar-btn" 
             onClick={triggerFileInput}
+            disabled={isAvatarUploading}
           >
-            Change Avatar
+            {isAvatarUploading ? "Uploading..." : "Change Avatar"}
           </Button>
         </div>
 
@@ -300,27 +218,27 @@ const ProfileSidebar = ({ isOpen, onClose }) => {
                 <label>Current Password</label>
                 <InputField
                   type="password"
-                  value={oldPassword}
-                  onChange={(e) => setOldPassword(e.target.value)}
-                  error={oldPasswordError}
+                  value={passwordForm.oldPassword}
+                  onChange={handlePasswordInputChange('oldPassword')}
+                  error={passwordForm.oldPasswordError}
                 />
               </div>
               <div className="input-container">
                 <label>New Password</label>
                 <InputField
                   type="password"
-                  value={newPassword}
-                  onChange={(e) => setNewPassword(e.target.value)}
-                  error={newPasswordError}
+                  value={passwordForm.newPassword}
+                  onChange={handlePasswordInputChange('newPassword')}
+                  error={passwordForm.newPasswordError}
                 />
               </div>
               <div className="input-container">
                 <label>Confirm New Password</label>
                 <InputField
                   type="password"
-                  value={confirmNewPassword}
-                  onChange={(e) => setConfirmNewPassword(e.target.value)}
-                  error={confirmNewPasswordError}
+                  value={passwordForm.confirmNewPassword}
+                  onChange={handlePasswordInputChange('confirmNewPassword')}
+                  error={passwordForm.confirmNewPasswordError}
                 />
               </div>
               
@@ -338,9 +256,6 @@ const ProfileSidebar = ({ isOpen, onClose }) => {
                 )}
               </Button>
 
-              {/* {success && <p className="success-message">{success}</p>} */}
-              {/* {error && <p className="error-message">{error}</p>} */}
-
               <div className="modal-buttons">
                 <Button 
                   className="submit-btn"
@@ -355,18 +270,27 @@ const ProfileSidebar = ({ isOpen, onClose }) => {
                     "Reset"
                   )}
                 </Button>
-                <Button 
-                  className="cancel-btn"
-                  onClick={closeChangePasswordModal}
-                >
-                  Cancel
-                </Button>
+                {!isResetPasswordLoading && (
+                  <Button 
+                    className="cancel-btn"
+                    onClick={closeChangePasswordModal}
+                  >
+                    Cancel
+                  </Button>
+                )}
               </div>
             </div>
           </div>
         )}
       </div>
-      {renderToast()}
+      
+      {toast.isVisible && (
+        <Toast 
+          message={toast.message}
+          type={toast.type}
+          onClose={() => dispatch(clearToast())}
+        />
+      )}
     </div>
   );
 };
