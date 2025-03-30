@@ -1,16 +1,16 @@
-import React, { useState, useEffect } from "react";
+import React, { useState } from "react";
 import { useForm } from "react-hook-form";
 import { yupResolver } from "@hookform/resolvers/yup";
 import * as yup from "yup";
 import { Link } from "react-router-dom";
 import InputField from "../../common/InputField";
 import "../../../assets/Auth.css";
-import { useAuth } from "../../../constants/AuthContext";
 import PATHS from "../../../constants/path";
 import ResendConfirmationButton from "../../common/ResendConfirmationButton";
 import Button from "../../common/Button";
 import Toast from "../../common/Toast";
-import authService from "../../../services/authService"; 
+import authService from "../../../services/authService";
+import withAuth from "../../../hoc/withAuth";
 
 const loginSchema = yup.object().shape({
   userName: yup.string()
@@ -23,8 +23,9 @@ const loginSchema = yup.object().shape({
       .max(800, "Password is too long"),
 });
 
-const LoginPage = () => {
-  const { login } = useAuth();
+const LoginPage = (props) => {
+  const { login } = props;
+  
   const [error, setError] = useState("");
   const [toast, setToast] = useState(null);
   const [rememberMe, setRememberMe] = useState(false);
@@ -45,12 +46,11 @@ const LoginPage = () => {
 
   const onSubmit = async (data) => {
     setIsLoading(true);
-    setError(""); // Clear any previous errors
+    setError(""); 
     try {
       await login(data.userName, data.password, rememberMe);
       showToast("Login successful!", "success");
     } catch (err) {
-      // Handle different types of login errors
       if (err.message.includes("not activated")) {
         setInactiveEmail(data.userName);
         showToast("Your account is not activated", "error");
@@ -64,6 +64,7 @@ const LoginPage = () => {
 
   const handleResetPassword = async () => {
     try {
+      setIsLoading(true); 
       setResetMessage(""); 
       setIsResetSent(false);
       await authService.requestResetPassword(email);
@@ -72,24 +73,31 @@ const LoginPage = () => {
       setIsResetSent(true);
     } catch (error) {
       showToast(error.message, "error");
-      setResetMessage("❌ " + error.message);
+      setResetMessage("❌ Check email address again !");
+    } finally {
+      setIsLoading(false); 
     }
   };
 
   const handleResendResetPassword = async () => {
     try {
+      setIsLoading(true);
       setResetMessage(""); 
       await authService.resendResetPassword(email);
       showToast("New reset password email sent!", "success");
       setResetMessage("✅ A new reset password email has been sent!");
     } catch (error) {
       showToast(error.message, "error");
-      setResetMessage("❌ " + error.message);
+      setResetMessage("❌ Check email address again !");
+    } finally {
+      setIsLoading(false); 
     }
   };
 
   const closeModal = () => {
     setEmail("");
+    setResetMessage(""); 
+    setIsResetSent(false); 
     setShowModal(false);
   };
 
@@ -185,8 +193,19 @@ const LoginPage = () => {
             />
             {!isResetSent ? (
               <>
-                <Button className="modalButton" onClick={handleResetPassword}>
-                  Send Reset Link
+                <Button 
+                  className="modalButton" 
+                  onClick={handleResetPassword}
+                  disabled={isLoading}
+                >
+                  {isLoading ? (
+                      <span className="loading-indicator">
+                        <span className="loading-spinner"></span> Processing...
+                      </span>
+                    ) : (
+                      "Send reset link"
+                    )
+                  }
                 </Button>
                 <Button className="modalClose" onClick={closeModal}>
                   Close
@@ -194,11 +213,22 @@ const LoginPage = () => {
               </>
             ) : (
               <>
-                <Button className="modalButton" onClick={handleResendResetPassword}>
-                  Resend
+                <Button 
+                  className="modalButton" 
+                  onClick={handleResendResetPassword}
+                  disabled={isLoading}  
+                >
+                  {isLoading ? (
+                      <span className="loading-indicator">
+                        <span className="loading-spinner"></span> Processing...
+                      </span>
+                    ) : (
+                      "Resend"
+                    )
+                  }
                 </Button>
                 <Button className="modalClose" onClick={closeModal}>
-                  Login
+                  Close
                 </Button>
               </>
             )}
@@ -210,4 +240,6 @@ const LoginPage = () => {
   );
 };
 
-export default LoginPage;
+// Export the wrapped component with requireAuth set to false
+// This is because login page should be accessible to unauthenticated users
+export default withAuth(LoginPage, false);

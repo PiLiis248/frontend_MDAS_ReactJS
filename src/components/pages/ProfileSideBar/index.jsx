@@ -23,7 +23,7 @@ const ProfileSidebar = ({ isOpen, onClose }) => {
     role: "",
   });
 
-  const [loading, setLoading] = useState(true);
+  const [isLoading, setIsLoading] = useState(true);
   const [isClosing, setIsClosing] = useState(false);
   const fileInputRef = useRef(null);
 
@@ -34,6 +34,10 @@ const ProfileSidebar = ({ isOpen, onClose }) => {
   const [confirmNewPassword, setConfirmNewPassword] = useState("");
   const [error, setError] = useState("");
   const [success, setSuccess] = useState("");
+
+  // Separate loading states for each button
+  const [isResetPasswordLoading, setIsResetPasswordLoading] = useState(false);
+  const [isForgotPasswordLoading, setIsForgotPasswordLoading] = useState(false);
 
   // Password error states
   const [oldPasswordError, setOldPasswordError] = useState("");
@@ -68,10 +72,10 @@ const ProfileSidebar = ({ isOpen, onClose }) => {
         }
 
         setUser(userData);
-        setLoading(false);
+        setIsLoading(false);
       } catch (err) {
         console.error("Failed to load user profile");
-        setLoading(false);
+        setIsLoading(false);
       }
     };
 
@@ -159,6 +163,7 @@ const ProfileSidebar = ({ isOpen, onClose }) => {
     if (!isValid) return;  
 
     try {
+      setIsResetPasswordLoading(true);
       const payload = { 
         email: user.email, 
         oldPassword, 
@@ -180,11 +185,14 @@ const ProfileSidebar = ({ isOpen, onClose }) => {
         type: 'error',
         isVisible: true
       });
+    } finally {
+      setIsResetPasswordLoading(false);
     }
   };
 
   const handleForgotPasswordSubmit = async () => {
     try {
+      setIsForgotPasswordLoading(true);
       await authService.requestResetPassword(user.email);
       setToast({
         message: 'Reset password link has been sent to email. Please check email or spam!',
@@ -197,6 +205,8 @@ const ProfileSidebar = ({ isOpen, onClose }) => {
         type: 'error',
         isVisible: true
       });
+    } finally {
+      setIsForgotPasswordLoading(false);
     }
   };
 
@@ -212,7 +222,7 @@ const ProfileSidebar = ({ isOpen, onClose }) => {
     );
   };
 
-  if (loading) return null;
+  if (isLoading) return null;
 
   return (
     <div 
@@ -317,19 +327,33 @@ const ProfileSidebar = ({ isOpen, onClose }) => {
               <Button 
                 className="forgot-password-btn"
                 onClick={handleForgotPasswordSubmit}
+                disabled={isForgotPasswordLoading}
               >
-                Forgot Password
+                {isForgotPasswordLoading ? (
+                  <span className="loading-indicator">
+                    <span className="loading-spinner"></span> Processing...
+                  </span>
+                ) : (
+                  "Forgot Password"
+                )}
               </Button>
 
-              {success && <p className="success-message">{success}</p>}
-              {error && <p className="error-message">{error}</p>}
+              {/* {success && <p className="success-message">{success}</p>} */}
+              {/* {error && <p className="error-message">{error}</p>} */}
 
               <div className="modal-buttons">
                 <Button 
                   className="submit-btn"
                   onClick={handleSubmitPasswordChange}
+                  disabled={isResetPasswordLoading}
                 >
-                  Submit
+                  {isResetPasswordLoading ? (
+                    <span className="loading-indicator">
+                      <span className="loading-spinner"></span> Processing...
+                    </span>
+                  ) : (
+                    "Reset"
+                  )}
                 </Button>
                 <Button 
                   className="cancel-btn"
