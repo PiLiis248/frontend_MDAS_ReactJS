@@ -39,6 +39,10 @@ const ManageGroupPage = () => {
   const [editGroupName, setEditGroupName] = useState("");
   const [editTotalMember, setEditTotalMember] = useState("");
   
+  // New state for tracking page-specific selections
+  const [selectionsPerPage, setSelectionsPerPage] = useState({});
+  const [currentPageSelectAll, setCurrentPageSelectAll] = useState(false);
+  
   // Local state for filters
   const [searchTerm, setSearchTerm] = useState("");
   const [minMembers, setMinMembers] = useState("");
@@ -58,6 +62,36 @@ const ManageGroupPage = () => {
       maxMembers
     ));
   }, [dispatch, searchTerm, localCurrentPage, sortField, sortType, minMembers, maxMembers]);
+
+  // Reset selections when filter criteria change
+  useEffect(() => {
+    setSelectedGroups([]);
+    setSelectionsPerPage({});
+    setCurrentPageSelectAll(false);
+  }, [searchTerm, minMembers, maxMembers]);
+
+  // Update current page selection state when page changes or groups load
+  useEffect(() => {
+    if (groups.length > 0) {
+      // Check if we have selections for this page stored
+      const pageSelections = selectionsPerPage[localCurrentPage] || [];
+      
+      // Check if all items on this page are selected
+      const allSelected = pageSelections.length === groups.length && 
+        groups.every(group => pageSelections.includes(group.id));
+      
+      setCurrentPageSelectAll(allSelected);
+    } else {
+      setCurrentPageSelectAll(false);
+    }
+  }, [groups, localCurrentPage, selectionsPerPage]);
+
+  // Update the selected groups array whenever page selections change
+  useEffect(() => {
+    // Combine all selections from all pages
+    const allSelections = Object.values(selectionsPerPage).flat();
+    setSelectedGroups(allSelections);
+  }, [selectionsPerPage]);
 
   // Handle sorting
   const handleSort = (field) => {
@@ -106,7 +140,9 @@ const ManageGroupPage = () => {
   // Delete group handler
   const handleDeleteGroups = () => {
     dispatch(deleteGroups(selectedGroups, localCurrentPage, groups.length));
+    setSelectionsPerPage({});
     setSelectedGroups([]);
+    setCurrentPageSelectAll(false);
     setIsDeleteModalOpen(false);
   };
 
@@ -115,15 +151,59 @@ const ManageGroupPage = () => {
     setMinMembers("");
     setMaxMembers("");
     setLocalCurrentPage(1);
+    setSelectionsPerPage({});
+    setSelectedGroups([]);
+    setCurrentPageSelectAll(false);
   };
 
   // Toggle group selection
   const toggleGroupSelection = (groupId) => {
-    setSelectedGroups(prev => 
-      prev.includes(groupId) 
-        ? prev.filter(id => id !== groupId) 
-        : [...prev, groupId]
+    // Get current page selections
+    const currentSelections = selectionsPerPage[localCurrentPage] || [];
+    
+    // Toggle the selected item
+    let updatedPageSelections;
+    if (currentSelections.includes(groupId)) {
+      updatedPageSelections = currentSelections.filter(id => id !== groupId);
+    } else {
+      updatedPageSelections = [...currentSelections, groupId];
+    }
+    
+    // Update selections state for this page
+    setSelectionsPerPage({
+      ...selectionsPerPage,
+      [localCurrentPage]: updatedPageSelections
+    });
+    
+    // Update current page select all state
+    setCurrentPageSelectAll(
+      updatedPageSelections.length === groups.length && 
+      groups.every(group => updatedPageSelections.includes(group.id))
     );
+  };
+
+  // Toggle select all for current page
+  const toggleSelectAllCurrentPage = () => {
+    if (currentPageSelectAll) {
+      // Deselect all on current page
+      const updatedSelections = { ...selectionsPerPage };
+      delete updatedSelections[localCurrentPage];
+      setSelectionsPerPage(updatedSelections);
+      setCurrentPageSelectAll(false);
+    } else {
+      // Select all on current page
+      setSelectionsPerPage({
+        ...selectionsPerPage,
+        [localCurrentPage]: groups.map(group => group.id)
+      });
+      setCurrentPageSelectAll(true);
+    }
+  };
+
+  // Check if a group is selected
+  const isGroupSelected = (groupId) => {
+    const pageSelections = selectionsPerPage[localCurrentPage] || [];
+    return pageSelections.includes(groupId);
   };
 
   // Toggle Profile Sidebar
@@ -231,14 +311,8 @@ const ManageGroupPage = () => {
                     <th className="selection-column">
                       <input 
                         type="checkbox"
-                        checked={selectedGroups.length === groups.length}
-                        onChange={() => {
-                          setSelectedGroups(
-                            selectedGroups.length === groups.length 
-                              ? [] 
-                              : groups.map(group => group.id)
-                          );
-                        }}
+                        checked={currentPageSelectAll}
+                        onChange={toggleSelectAllCurrentPage}
                       />
                     </th>
                     <th 
@@ -264,7 +338,7 @@ const ManageGroupPage = () => {
                       <td>
                         <input 
                           type="checkbox"
-                          checked={selectedGroups.includes(group.id)}
+                          checked={isGroupSelected(group.id)}
                           onChange={() => toggleGroupSelection(group.id)}
                         />
                       </td>
@@ -277,6 +351,15 @@ const ManageGroupPage = () => {
                   ))}
                 </tbody>
               </table>
+
+              {/* Selected groups info banner */}
+              {selectedGroups.length > 0 && (
+                <div className="selection-info-banner">
+                  <p>
+                    {selectedGroups.length} groups selected from {Object.keys(selectionsPerPage).length} page(s)
+                  </p>
+                </div>
+              )}
 
               {/* Pagination */}
               <div className="pagination">
@@ -377,7 +460,6 @@ const ManageGroupPage = () => {
               </Button>
               <Button onClick={() => {
                 setIsDeleteModalOpen(false);
-                setSelectedGroups([]);
               }}>Cancel</Button>
             </div>
           </div>

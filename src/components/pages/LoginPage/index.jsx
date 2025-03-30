@@ -6,7 +6,7 @@ import { Link } from "react-router-dom";
 import InputField from "../../common/InputField";
 import "../../../assets/Auth.css";
 import PATHS from "../../../constants/path";
-import ResendConfirmationButton from "../../common/ResendConfirmationButton";
+import ResendConfirmationForm from "../../common/ResendConfirmationForm";
 import Button from "../../common/Button";
 import Toast from "../../common/Toast";
 import authService from "../../../services/authService";
@@ -69,7 +69,7 @@ const LoginPage = (props) => {
       setIsResetSent(false);
       await authService.requestResetPassword(email);
       showToast("Reset password email sent!", "success");
-      setResetMessage("✅ We have sent an email. Please check your email or spam!");
+      setResetMessage("✅ The link will expired after 5 mins. Please check your email or spam!");
       setIsResetSent(true);
     } catch (error) {
       showToast(error.message, "error");
@@ -85,7 +85,7 @@ const LoginPage = (props) => {
       setResetMessage(""); 
       await authService.resendResetPassword(email);
       showToast("New reset password email sent!", "success");
-      setResetMessage("✅ A new reset password email has been sent!");
+      setResetMessage("✅ The link will expired after 5 mins. Please check your email or spam!");
     } catch (error) {
       showToast(error.message, "error");
       setResetMessage("❌ Check email address again !");
@@ -113,70 +113,69 @@ const LoginPage = (props) => {
       )}
 
       <div className="authBox">
-        <h2 className="title">LOGIN</h2>
-        {error && <p className="error">{error}</p>}
-        <center>
-          {inactiveEmail && (
-            <div className="buttonGroup">
-              <ResendConfirmationButton email={inactiveEmail} />
-              <Button 
-                className="modalClose"
-                onClick={() => {
-                  setInactiveEmail(null);
-                  setError(""); 
-                }}
-              >
-                Close
-              </Button>
-            </div>
-          )}
-        </center>
-        <form onSubmit={handleSubmit(onSubmit)} className="form">
-          <InputField 
-            label="Username"
-            register={register("userName")} 
-            error={errors.userName?.message} 
-            placeholder="Enter your username"
-          />
-          <InputField 
-            label="Password" 
-            type="password" 
-            register={register("password")} 
-            error={errors.password?.message} 
-            placeholder="Enter your password"
-          />
-          <div className="rememberMeContainer">
-            <label>
-              <input
-                type="checkbox"
-                checked={rememberMe} 
-                onChange={() => setRememberMe(!rememberMe)}
+        {/* <h2 className="title">LOGIN</h2>
+        {error && <p className="error">{error}</p>} */}
+        {!inactiveEmail ? (
+          <>
+            <h2 className="title">LOGIN</h2>
+            <form onSubmit={handleSubmit(onSubmit)} className="form">
+              <InputField 
+                label="Username"
+                register={register("userName")}
+                error={errors.userName?.message}
+                placeholder="Enter your username"
               />
-              Remember me
-            </label>
-            <Link type="button" className="link" onClick={() => setShowModal(true)}>
-              Forgot Password?
-            </Link>
-          </div>
-          <center>
-          <Button 
-            type="submit" 
-            className="submitLoginButton"
-            disabled={isLoading}
-          >
-            {isLoading ? (
-                <span className="loading-indicator">
-                  <span className="loading-spinner"></span> Processing...
-                </span>
-              ) : (
-                "Login"
-              )}
-          </Button>
-          </center>
-        </form>
-        <p className="footerText">
-          Don't have an account? <Link to={PATHS.register} className="link">Register</Link>
-        </p>
+              <InputField 
+                label="Password" 
+                type="password" 
+                register={register("password")}
+                error={errors.password?.message}
+                placeholder="Enter your password"
+              />
+              <div className="rememberMeContainer">
+                <label>
+                  <input
+                    type="checkbox"
+                    checked={rememberMe} 
+                    onChange={() => setRememberMe(!rememberMe)}
+                  />
+                  Remember me
+                </label>
+                <Link type="button" className="link" onClick={() => setShowModal(true)}>
+                  Forgot Password?
+                </Link>
+              </div>
+              <Button 
+                type="submit" 
+                className="submitLoginButton"
+                disabled={isLoading}
+              >
+                {isLoading ? (
+                    <span className="loading-indicator">
+                      <span className="loading-spinner"></span> Processing...
+                    </span>
+                  ) : (
+                    "Login"
+                  )}
+              </Button>
+            </form>
+            <p className="footerText">
+              Don't have an account? <Link to={PATHS.register} className="link">Register</Link>
+            </p>
+          </>
+        ) : (
+          <>
+            <center>
+              <p className="title">Inactivated Account</p>
+              <p className="inactiveConfirm">Your account has not been activated. Please check your email or spam for the activation link.</p>
+              <p className="inactiveConfirm">The link will expired after 30 days. If so, please click resend button below.</p>
+              <ResendConfirmationForm />
+              <Link type="button" className="link" onClick={() => setInactiveEmail(null)}>
+                Close
+              </Link>
+            </center>
+          </>
+        )}
       </div>
 
       {/* Modal Forgot Password */}
@@ -194,7 +193,7 @@ const LoginPage = (props) => {
             {!isResetSent ? (
               <>
                 <Button 
-                  className="modalButton" 
+                  className="submitResetButton" 
                   onClick={handleResetPassword}
                   disabled={isLoading}
                 >
@@ -207,14 +206,14 @@ const LoginPage = (props) => {
                     )
                   }
                 </Button>
-                <Button className="modalClose" onClick={closeModal}>
+                <Link type="button" className="link" onClick={() => setShowModal(false)}>
                   Close
-                </Button>
+                </Link>
               </>
             ) : (
               <>
                 <Button 
-                  className="modalButton" 
+                  className="submitResendButton" 
                   onClick={handleResendResetPassword}
                   disabled={isLoading}  
                 >
@@ -227,9 +226,9 @@ const LoginPage = (props) => {
                     )
                   }
                 </Button>
-                <Button className="modalClose" onClick={closeModal}>
+                <Link type="button" className="link" onClick={() => setShowModal(false)}>
                   Close
-                </Button>
+                </Link>
               </>
             )}
             {resetMessage && <p className="resetMessage">{resetMessage}</p>}

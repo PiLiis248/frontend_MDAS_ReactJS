@@ -8,7 +8,7 @@ import Toast from "../../common/Toast";
 import "../../../assets/Auth.css";
 import PATHS from "../../../constants/path";
 import authService from "../../../services/authService"; 
-import ResendConfirmationButton from "../../common/ResendConfirmationButton";
+import ResendConfirmationForm from "../../common/ResendConfirmationForm";
 import Button from "../../common/Button";
 
 // Schema kiểm tra đăng ký (remains the same)
@@ -96,15 +96,13 @@ const RegisterPage = () => {
         {successMessage && (
           <>
             <p className="success">{successMessage}</p>
-            <div className="buttonGroup">
-              <ResendConfirmationButton 
-                email={registeredEmail} 
-                onSuccessMessageChange={setSuccessMessage} 
-              />
-              <Button className="loginButton" onClick={() => navigate(PATHS.login)}>
-                Login
-              </Button>
-            </div>
+            <ResendConfirmationForm 
+              email={registeredEmail} 
+              onSuccessMessageChange={setSuccessMessage} 
+            />
+            <center>
+              <Link to={PATHS.login} className="link">Login</Link>
+            </center>
           </>
         )}
 

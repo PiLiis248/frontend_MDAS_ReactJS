@@ -30,13 +30,13 @@ const ResetPasswordPage = () => {
   const { register, handleSubmit, formState: { errors } } = useForm({
     resolver: yupResolver(resetPasswordSchema),
   });
-
+  
   // Show notification helper
   const showNotification = (message, type) => {
     setNotification({ message, type });
     setTimeout(() => setNotification(null), 3000);
   };
-
+  
   const onSubmit = async (data) => {
     try {
       setIsLoading(true);
@@ -87,7 +87,7 @@ const ResetPasswordPage = () => {
           <center>
             <Button 
               type="submit" 
-              className="submitButton"
+              className="submitResetButton"
               disabled={isLoading}
             >
               {isLoading ? (
