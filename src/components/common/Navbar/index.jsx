@@ -20,7 +20,7 @@ const Navbar = ({ onOpenProfile }) => {
 
         // If no avatar, use default
         if (userData.avatarUrl === null) {
-          userData = { ...userData, avatarUrl: "hearts.jpg" };
+          userData = { ...userData, avatarUrl: "Default/hearts.jpg" };
         }
 
         setUsername(`${userData.firstName} ${userData.lastName}`);
@@ -64,7 +64,7 @@ const Navbar = ({ onOpenProfile }) => {
             className="user-avatar" 
             onError={(e) => {
               e.target.onerror = null;
-              e.target.src = '/Avatars/hearts.jpg';
+              e.target.src = '/Avatars/Default/hearts.jpg';
             }}
           />
           <div className="user-info">

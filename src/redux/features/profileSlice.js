@@ -12,7 +12,7 @@ export const fetchUserProfile = createAsyncThunk(
       let userData = response.data;
       
       if (userData.avatarUrl === null) {
-        userData = { ...userData, avatarUrl: "hearts.jpg" };
+        userData = { ...userData, avatarUrl: "Default/hearts.jpg" };
       }
       
       return userData;

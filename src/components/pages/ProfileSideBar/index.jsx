@@ -157,6 +157,10 @@ const ProfileSidebar = ({ isOpen, onClose }) => {
             src={`/Avatars/${user.avatarUrl}`} 
             alt="Profile Avatar" 
             className="profile-avatar" 
+            onError={(e) => {
+              e.target.onerror = null;
+              e.target.src = '/Avatars/Default/hearts.jpg';
+            }}
           />
           <input
             type="file"
