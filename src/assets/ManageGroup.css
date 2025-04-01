@@ -93,6 +93,11 @@
   margin-bottom: 25px;
 }
 
+.member-filter {
+  display: flex;
+  gap: 15px;
+}
+
 .search-input, .member-input {
   flex: 1;
   padding: 12px 15px;
@@ -179,10 +184,10 @@ table td:last-child {
 }
 
 table td button {
-  padding: 8px 15px;
-  background-color: #BB8898;
-  color: white;
-  border: none;
+  padding: 5px 10px;
+  border: 1.5px solid#BB8898;
+  background-color: transparent;
+  color: black;
   border-radius: 6px;
   cursor: pointer;
   font-size: 0.9rem;
@@ -191,7 +196,8 @@ table td button {
 }
 
 table td button:hover {
-  background-color: #592C3B;
+  border: 1/5px solid#592C3B;
+  background-color: transparent;
   transform: translateY(-2px);
   box-shadow: 0 6px 8px rgba(52, 152, 219, 0.2);
 }
@@ -268,32 +274,45 @@ table td button:hover {
   cursor: pointer;
   font-weight: 600;
   transition: all 0.3s ease;
+  position: relative;
 }
 
 .create-group-btn {
-  background-color: #2ecc71;
-  color: white;
+  border: 1px solid #2ecc71;
+  background-color: transparent;
+  color: black;
+  transition: .3s ease-in-out;
 }
 
 .create-group-btn:hover {
+  color: white;
+  border: 1px solid #2ecc71;
   background-color: #27ae60;
 }
 
 .delete-group-btn {
-  background-color: #e74c3c;
-  color: white;
+  border: 1px solid #e74c3c;
+  background-color: transparent;
+  color: black;
+  transition: .3s ease-in-out;
 }
 
 .delete-group-btn:hover {
+  color: white;
+  border: 1px solid #c0392b;
   background-color: #c0392b;
 }
 
 .refresh-form-btn {
-  background-color: #FFE7B5;
-  color: white;
+  border: 1px solid #FFE7B5;
+  background-color: transparent;
+  color: black;
+  transition: .3s ease-in-out;
 }
 
 .refresh-form-btn:hover {
+  color: white;
+  border: 1px solid #CA864B;
   background-color: #CA864B;
 }
 

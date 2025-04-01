@@ -241,7 +241,7 @@ const ManageGroupPage = () => {
                 className="create-group-btn" 
                 onClick={() => setIsCreateModalOpen(true)}
               >
-                Create Group
+                ✚ Group
               </Button>
               <Button 
                 className="delete-group-btn" 
@@ -261,7 +261,8 @@ const ManageGroupPage = () => {
           
           {/* Filters and Search */}
           <div className="filter-container">
-            <input 
+            <InputField 
+              label=""
               type="text" 
               placeholder="Search groups..." 
               value={searchTerm}
@@ -272,7 +273,8 @@ const ManageGroupPage = () => {
               className="search-input"
             />
             <div className="member-filter">
-              <input 
+              <InputField 
+                label=""
                 type="number" 
                 placeholder="Min Members" 
                 value={minMembers}
@@ -282,7 +284,8 @@ const ManageGroupPage = () => {
                 }}
                 className="member-input"
               />
-              <input 
+              <InputField 
+                label=""
                 type="number" 
                 placeholder="Max Members" 
                 value={maxMembers}
@@ -394,9 +397,6 @@ const ManageGroupPage = () => {
               onChange={(e) => setNewGroupName(e.target.value)}
               placeholder="Enter group name"
             />
-            <div className="character-count">
-              {newGroupName.length}/50 characters
-            </div>
             <div className="modal-actions">
               <Button 
                 onClick={handleCreateGroup}
@@ -422,9 +422,6 @@ const ManageGroupPage = () => {
               onChange={(e) => setEditGroupName(e.target.value)}
               placeholder="Enter group name"
             />
-            <div className="character-count">
-              {editGroupName.length}/50 characters
-            </div>
             <InputField 
               label="Total Members"
               type="number"

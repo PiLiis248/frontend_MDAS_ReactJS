@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 import "../../../assets/InputField.css";
 
-const InputField = ({ label, type = "text", register, value, onChange, checked, error, placeholder }) => {
+const InputField = ({ label, type = "text", register, value, onChange, checked, error, placeholder, className }) => {
   const [showPassword, setShowPassword] = useState(false);
   
   // Determine if this is a password field that needs a toggle
@@ -29,7 +29,7 @@ const InputField = ({ label, type = "text", register, value, onChange, checked, 
               <input
                 type={inputType}
                 {...(register ? register : { value, onChange })}
-                className={`input ${isPassword ? 'password-input' : ''}`}
+                className={`input ${isPassword ? 'password-input' : className ? className : ''}`}
                 placeholder={placeholder}
               />
               {isPassword && (

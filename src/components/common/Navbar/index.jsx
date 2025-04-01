@@ -83,7 +83,7 @@ const Navbar = ({ onOpenProfile }) => {
           className="logout-btn" 
           onClick={handleLogout}
         >
-          Logout
+          ⍈
         </button>
       </div>
     </nav>

@@ -39,14 +39,14 @@
 }
 
 .view-profile-btn {
-  background-color: #D18CDD;
+  border: 1px solid #D18CDD;
+  background-color: transparent;
   color: white;
-  border: none;
-  padding: 8px 15px;
+  padding: 5px 10px;
   border-radius: 5px;
   cursor: pointer;
   transition: background-color 0.3s ease;
-  font-size: 14px;
+  font-size: 12px;
   width: fit-content;
 }
 
@@ -60,16 +60,17 @@
 }
 
 .logout-btn {
-  background-color: #FAC7EE;
-  color: white;
   border: none;
-  padding: 10px 20px;
-  border-radius: 5px;
+  background-color: transparent;
+  color: white;
+  padding: 0;
+  /* border-radius: 5px; */
   cursor: pointer;
-  transition: background-color 0.3s ease;
-  font-size: 16px;
+  transition: 0.3s ease;
+  font-size: 1.5em;
 }
 
 .logout-btn:hover {
-  background-color: #BB1F58;
+  font-weight: bold;
+  transform: translateX(5px);
 }
