@@ -1,4 +1,4 @@
-import * as types from '../constants/groupConstants';
+import * as types from '../group/groupConstants';
 
 const initialState = {
   groups: [],

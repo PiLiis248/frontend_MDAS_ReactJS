@@ -12,7 +12,7 @@ import {
   editGroup,
   deleteGroups,
   setNotification
-} from "../../../redux/actions/groupActions";
+} from "../../../redux/group/groupActions";
 
 const ManageGroupPage = () => {
   const dispatch = useDispatch();

@@ -5,7 +5,7 @@ import { yupResolver } from "@hookform/resolvers/yup";
 import authService from "../../../services/authService";
 import "../../../assets/Auth.css";
 import Button from "../Button";
-import InputField from "../InputField"; // Ensure this is correctly imported
+import InputField from "../InputField"; 
 
 // Yup Schema for email validation
 const schema = yup.object().shape({

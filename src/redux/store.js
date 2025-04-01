@@ -1,7 +1,7 @@
 import { configureStore } from "@reduxjs/toolkit";
 import { thunk } from "redux-thunk";
-import { groupReducer } from "./reducers/groupReducers";
-import profileReducer from './features/profileSlice';
+import { groupReducer } from "./group/groupReducers";
+import profileReducer from './profile/profileSlice';
 
 const store = configureStore({
   reducer: {

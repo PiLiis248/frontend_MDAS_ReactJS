@@ -24,24 +24,26 @@ const withAuth = (WrappedComponent, requireAuth = true) => {
     const login = async (username, password, rememberMe) => {
       try {
         const userData = await authService.login(username, password, rememberMe, setUser);
+        
         if (!userData || !userData.user) {
           throw new Error("Your account has not been registered!");
         }
-
+    
         if (userData.user.status !== "ACTIVE") {
           throw new Error("Your account is not activated. Please check your email.");
         }
-
-        if (JSON.stringify(user) !== JSON.stringify(userData)) { // Chỉ cập nhật khi có thay đổi
+    
+        if (JSON.stringify(user) !== JSON.stringify(userData)) { 
           setUser(userData);
         }
         setIsAuthenticated(true);
         navigate(PATHS.manageGroup);
         return userData;
       } catch (error) {
-        throw new Error(error.message || "Invalid username or password");
+        throw new Error(error.message || "Invalid username or password"); 
       }
     };
+    
 
     const logout = async () => {
       await authService.logout(setUser);

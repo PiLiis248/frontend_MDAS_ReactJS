@@ -24,11 +24,12 @@ axiosInstance.interceptors.response.use(
   (response) => response,
   (error) => {
     if (error.response && error.response.status === 401) {
-      alert("Your account is not permitted to login this web! \nRegister or activate your account now    !");
+      console.error("Unauthorized error in Axios: ", error);  // Ghi lỗi để debug
       tokenMethod.remove();
     }
-    return Promise.reject(error);
+    return Promise.reject(error); // Truyền lỗi đi tiếp
   }
 );
+
 
 export default axiosInstance;

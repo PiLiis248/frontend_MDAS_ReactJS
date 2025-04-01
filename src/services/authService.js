@@ -6,33 +6,45 @@ const authService = {
   // ✅ Đăng nhập (Login)
   async login(username, password, rememberMe, setUser) {
     try {
-      const response = await axiosInstance.post(
-        `/login?username=${encodeURIComponent(username)}&password=${encodeURIComponent(password)}`
-      );
-      console.log("login: " + response + " ...");
-      const authData = {
-        token: response.data.token,
-        user: {
-          userName: response.data.userName,
-          email: response.data.email,
-          firstName: response.data.firstName,
-          lastName: response.data.lastName,
-          role: response.data.role,
-          status: response.data.status,
-        },
-      };
+        const response = await axiosInstance.post(
+            `/login?username=${encodeURIComponent(username)}&password=${encodeURIComponent(password)}`
+        );
 
-      // Lưu token dựa trên rememberMe
-      tokenMethod.set(authData, rememberMe);
+        const authData = {
+            token: response.data.token,
+            user: {
+                userName: response.data.userName,
+                email: response.data.email,
+                firstName: response.data.firstName,
+                lastName: response.data.lastName,
+                role: response.data.role,
+                status: response.data.status,
+            },
+        };
 
-      // Gọi AuthContext để cập nhật trạng thái user
-      setUser(authData);
+        // Lưu token dựa trên rememberMe
+        tokenMethod.set(authData, rememberMe);
 
-      return authData;
+        // Gọi AuthContext để cập nhật trạng thái user
+        setUser(authData);
+
+        return authData;
     } catch (error) {
-      console.error("Login failed:", error);
-      // Throw the error instead of returning null
-      throw error.response?.data?.message || error.message || "Login failed";
+        let errorMessage = "Login failed";
+
+        if (error.response) {
+            if (error.response.status === 404) {
+                errorMessage = "Server not found. Check API URL.";
+            } else if (error.response.status === 401) {
+                errorMessage = "Invalid username or password"; // ✅ Xử lý sai mật khẩu
+            } else if (error.response.data?.message) {
+                errorMessage = error.response.data.message;
+            }
+        } else if (error.message) {
+            errorMessage = error.message;
+        }
+
+        throw new Error(errorMessage); 
     }
   },
 

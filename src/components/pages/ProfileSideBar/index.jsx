@@ -20,7 +20,7 @@ import {
   updatePasswordField,
   setPasswordErrors,
   clearToast
-} from "../../../redux/features/profileSlice";
+} from "../../../redux/profile/profileSlice";
 
 const ProfileSidebar = ({ isOpen, onClose }) => {
   const dispatch = useDispatch();

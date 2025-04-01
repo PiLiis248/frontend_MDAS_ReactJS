@@ -47,18 +47,25 @@ const LoginPage = (props) => {
   const onSubmit = async (data) => {
     setIsLoading(true);
     setError(""); 
+  
     try {
       await login(data.userName, data.password, rememberMe);
-      showToast("Login successful!", "success");
+      showToast("Login successful!", "success"); 
     } catch (err) {
+      console.error("Login Error:", err.message);
+  
       if (err.message.includes("not activated")) {
         setInactiveEmail(data.userName);
         showToast("Your account is not activated", "error");
-      } 
+      } else {
+        showToast(err.message || "Invalid username or password", "error"); 
+      }
+  
     } finally {
       setIsLoading(false);
     }
   };
+  
 
   const handleResetPassword = async () => {
     try {
