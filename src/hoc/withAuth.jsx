@@ -13,22 +13,18 @@ const withAuth = (WrappedComponent, requireAuth = true) => {
     const navigate = useNavigate();
 
     useEffect(() => {
-      // Check if user is authenticated on component mount
       const storedUser = tokenMethod.get();
-      
-      if (storedUser) {
+      if (storedUser && storedUser !== user) {
         setUser(storedUser);
-        setIsAuthenticated(true);
       }
-      
       setIsLoading(false);
     }, []);
+    
 
     const login = async (username, password, rememberMe) => {
       try {
         const userData = await authService.login(username, password, rememberMe, setUser);
-        
-        if (!userData) {
+        if (!userData || !userData.user) {
           throw new Error("Your account has not been registered!");
         }
 
@@ -36,8 +32,10 @@ const withAuth = (WrappedComponent, requireAuth = true) => {
           throw new Error("Your account is not activated. Please check your email.");
         }
 
+        if (JSON.stringify(user) !== JSON.stringify(userData)) { // Chỉ cập nhật khi có thay đổi
+          setUser(userData);
+        }
         setIsAuthenticated(true);
-        setUser(userData);
         navigate(PATHS.manageGroup);
         return userData;
       } catch (error) {

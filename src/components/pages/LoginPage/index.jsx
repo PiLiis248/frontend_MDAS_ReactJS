@@ -54,9 +54,7 @@ const LoginPage = (props) => {
       if (err.message.includes("not activated")) {
         setInactiveEmail(data.userName);
         showToast("Your account is not activated", "error");
-      } else {
-        showToast(err.message || "Invalid username or password", "error");
-      }
+      } 
     } finally {
       setIsLoading(false);
     }
@@ -113,8 +111,6 @@ const LoginPage = (props) => {
       )}
 
       <div className="authBox">
-        {/* <h2 className="title">LOGIN</h2>
-        {error && <p className="error">{error}</p>} */}
         {!inactiveEmail ? (
           <>
             <h2 className="title">LOGIN</h2>
@@ -168,8 +164,8 @@ const LoginPage = (props) => {
             <center>
               <p className="title">Inactivated Account</p>
               <p className="inactiveConfirm">Your account has not been activated. Please check your email or spam for the activation link.</p>
-              <p className="inactiveConfirm">The link will expired after 30 days. If so, please click resend button below.</p>
-              <ResendConfirmationForm />
+              <p className="inactiveConfirm">The link will expire after 30 days. If so, please provide your email to send activation link back.</p>
+              <ResendConfirmationForm onSuccessMessageChange={setToast}/>
               <Link type="button" className="link" onClick={() => setInactiveEmail(null)}>
                 Close
               </Link>

@@ -95,7 +95,7 @@ const RegisterPage = () => {
 
         {successMessage && (
           <>
-            <p className="success">{successMessage}</p>
+            {/* <p className="success">{successMessage}</p> */}
             <ResendConfirmationForm 
               email={registeredEmail} 
               onSuccessMessageChange={setSuccessMessage} 

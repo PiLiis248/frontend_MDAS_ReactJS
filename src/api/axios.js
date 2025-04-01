@@ -24,9 +24,8 @@ axiosInstance.interceptors.response.use(
   (response) => response,
   (error) => {
     if (error.response && error.response.status === 401) {
-      console.warn("Token expired, logging out...");
+      alert("Your account is not permitted to login this web! \nRegister or activate your account now    !");
       tokenMethod.remove();
-      // window.location.href = PATHS.login;
     }
     return Promise.reject(error);
   }
